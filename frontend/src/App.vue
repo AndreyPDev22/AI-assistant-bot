@@ -1,7 +1,80 @@
 <template>
-    123
+  <MessageItem
+    v-for="message in MESSAGES"
+    :key="message.id"
+    :message="message"
+  />
 </template>
 
-<style lang="scss" scoped>
+<script setup lang="ts">
+import MessageItem from './models/message/ui/Message.vue';
+import { SenderRole, type Message } from './models/message/model';
 
-</style>
+const MESSAGES: Message[] = [
+  { id: '1', senderRole: SenderRole.USER, text: 'Привет!', createdAt: '2026-10-16T10:00:00Z' },
+  {
+    id: '2',
+    senderRole: SenderRole.ASSISTANT,
+    text: 'Здравствуйте! **Чем могу помочь?**',
+    createdAt: '2026-10-16T10:00:05Z',
+  },
+  {
+    id: '3',
+    senderRole: SenderRole.USER,
+    text: 'Расскажи, что ты умеешь. Вот *пример* задания:',
+    files: [
+      { id: 'f1', name: 'document-1', extension: 'pdf', url: '/MessagesTestFiles/document-1.pdf' },
+    ],
+    createdAt: '2026-10-16T10:00:20Z',
+  },
+  {
+    id: '4',
+    senderRole: SenderRole.ASSISTANT,
+    text: 'Я умею:\n\n- отвечать на вопросы\n- писать тексты\n- разбирать файлы',
+    createdAt: '2026-10-16T10:00:25Z',
+  },
+  {
+    id: '5',
+    senderRole: SenderRole.USER,
+    text: 'Какая сегодня погода?',
+    createdAt: '2026-10-16T10:01:00Z',
+  },
+  {
+    id: '6',
+    senderRole: SenderRole.ASSISTANT,
+    text: 'У меня нет доступа к данным о погоде.',
+    createdAt: '2026-10-16T10:01:05Z',
+  },
+  {
+    id: '7',
+    senderRole: SenderRole.USER,
+    text: 'Ладно. Помоги написать письмо.',
+    createdAt: '2026-10-16T10:02:00Z',
+  },
+  {
+    id: '8',
+    senderRole: SenderRole.ASSISTANT,
+    text: 'Конечно! Кому и о чём нужно письмо?',
+    createdAt: '2026-10-16T10:02:05Z',
+  },
+  {
+    id: '9',
+    senderRole: SenderRole.USER,
+    text: 'Преподавателю, про **перенос дедлайна**. Прикладываю скриншоты.',
+    files: [
+      { id: 'f2', name: 'image', extension: 'png', url: '/MessagesTestFiles/image.png' },
+      { id: 'f3', name: 'photo', extension: 'jpg', url: '/MessagesTestFiles/photo.jpg' },
+    ],
+    createdAt: '2026-10-16T10:02:30Z',
+  },
+  {
+    id: '10',
+    senderRole: SenderRole.ASSISTANT,
+    text: 'Хорошо, вот [черновик письма](https://example.com):\n\n> Уважаемый преподаватель, прошу перенести срок сдачи…',
+    files: [{ id: 'f4', name: 'notes', extension: 'txt', url: '/MessagesTestFiles/notes.txt' }],
+    createdAt: '2026-10-16T10:02:40Z',
+  },
+];
+</script>
+
+<style lang="scss" scoped></style>
