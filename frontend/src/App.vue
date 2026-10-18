@@ -1,14 +1,18 @@
 <template>
-  <MessageItem
-    v-for="message in MESSAGES"
-    :key="message.id"
-    :message="message"
-  />
+  <div class="messages container">
+    <MessageItem
+      v-for="message in MESSAGES"
+      :key="message.id"
+      :message="message"
+    />
+  </div>
+  <div class="message-input-container container">
+    <MessageInput />
+  </div>
 </template>
 
 <script setup lang="ts">
-import MessageItem from './models/message/ui/Message.vue';
-import { SenderRole, type Message } from './models/message/model';
+import { MessageItem, MessageInput, SenderRole, type Message } from '@/modules/message';
 
 const MESSAGES: Message[] = [
   { id: '1', senderRole: SenderRole.USER, text: 'Привет!', createdAt: '2026-10-16T10:00:00Z' },
@@ -22,9 +26,7 @@ const MESSAGES: Message[] = [
     id: '3',
     senderRole: SenderRole.USER,
     text: 'Расскажи, что ты умеешь. Вот *пример* задания:',
-    files: [
-      { id: 'f1', name: 'document-1', extension: 'pdf', url: '/MessagesTestFiles/document-1.pdf' },
-    ],
+    files: [{ id: 'f1', name: 'document-1.pdf', url: '/MessagesTestFiles/document-1.pdf' }],
     createdAt: '2026-10-16T10:00:20Z',
   },
   {
@@ -62,8 +64,8 @@ const MESSAGES: Message[] = [
     senderRole: SenderRole.USER,
     text: 'Преподавателю, про **перенос дедлайна**. Прикладываю скриншоты.',
     files: [
-      { id: 'f2', name: 'image', extension: 'png', url: '/MessagesTestFiles/image.png' },
-      { id: 'f3', name: 'photo', extension: 'jpg', url: '/MessagesTestFiles/photo.jpg' },
+      { id: 'f2', name: 'image.png', url: '/MessagesTestFiles/image.png' },
+      { id: 'f3', name: 'photo.jpg', url: '/MessagesTestFiles/photo.jpg' },
     ],
     createdAt: '2026-10-16T10:02:30Z',
   },
@@ -71,10 +73,14 @@ const MESSAGES: Message[] = [
     id: '10',
     senderRole: SenderRole.ASSISTANT,
     text: 'Хорошо, вот [черновик письма](https://example.com):\n\n> Уважаемый преподаватель, прошу перенести срок сдачи…',
-    files: [{ id: 'f4', name: 'notes', extension: 'txt', url: '/MessagesTestFiles/notes.txt' }],
+    files: [{ id: 'f4', name: 'notes.txt', url: '/MessagesTestFiles/notes.txt' }],
     createdAt: '2026-10-16T10:02:40Z',
   },
 ];
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.message-input-container {
+  margin-top: 30px;
+}
+</style>

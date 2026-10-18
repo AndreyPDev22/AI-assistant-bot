@@ -3,10 +3,9 @@ export enum SenderRole {
   ASSISTANT = 'assistant',
 }
 
-type MessageFile = {
+export type MessageFile = {
   id: string;
   name: string;
-  extension: string;
   url: string;
 };
 

@@ -1,4 +1,8 @@
 const PREVIEW_WIDTH = 240;
+const FIRST_PAGE_NUMBER = 1;
+const BASE_SCALE = 1;
+const PREVIEW_IMAGE_TYPE = 'image/jpeg';
+const PREVIEW_IMAGE_QUALITY = 0.8;
 
 const cache = new Map<string, Promise<string>>();
 
@@ -25,9 +29,9 @@ async function renderFirstPage(url: string): Promise<string> {
 
   try {
     const pdf = await loadingTask.promise;
-    const page = await pdf.getPage(1);
+    const page = await pdf.getPage(FIRST_PAGE_NUMBER);
 
-    const baseViewport = page.getViewport({ scale: 1 });
+    const baseViewport = page.getViewport({ scale: BASE_SCALE });
     const viewport = page.getViewport({ scale: PREVIEW_WIDTH / baseViewport.width });
 
     const canvas = document.createElement('canvas');
@@ -36,7 +40,7 @@ async function renderFirstPage(url: string): Promise<string> {
 
     await page.render({ canvas, viewport }).promise;
 
-    return canvas.toDataURL('image/jpeg', 0.8);
+    return canvas.toDataURL(PREVIEW_IMAGE_TYPE, PREVIEW_IMAGE_QUALITY);
   } finally {
     await loadingTask.destroy();
   }
