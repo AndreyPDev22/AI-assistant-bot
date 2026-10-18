@@ -1,82 +1,39 @@
 <template>
   <div :class="['message', { 'message--assistant': message.senderRole === SenderRole.ASSISTANT }]">
     <div
-      v-if="message.files"
+      v-if="message.files?.length"
       class="message__files"
     >
-      <a
+      <FilePreview
         v-for="file in message.files"
         :key="file.id"
-        :href="file.url"
-        download
-        :class="[
-          'file',
-          { 'file--image': isImage(file.extension), 'file--is-pdf': isPdf(file.extension) },
-        ]"
-        :style="{ backgroundImage: pdfPreviews[file.id] ? `url(${pdfPreviews[file.id]})` : '' }"
-      >
-        <img
-          v-if="isImage(file.extension)"
-          class="file__preview"
-          :src="file.url"
-          alt=""
-        />
-        <div class="file__info">
-          <p class="file__name">{{ file.name }}</p>
-          <span class="file__extension">{{ file.extension }}</span>
-        </div>
-      </a>
+        :file
+      />
     </div>
+    <!-- eslint-disable vue/no-v-html -- html очищен через DOMPurify -->
     <div
       class="message__content"
       v-html="html"
     />
+    <!-- eslint-enable vue/no-v-html -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed } from 'vue';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 import { SenderRole, type Message } from '../model';
-import { getPdfPreview } from '../lib/pdfPreview';
-
-const PDF_EXTENSION = 'pdf';
-
-const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'avif'];
+import FilePreview from './FilePreview/FilePreview.vue';
 
 const { message } = defineProps<{
   message: Message;
 }>();
 
-const html = computed(() => marked.parse(message.text, { async: false, breaks: true }));
-
-const pdfPreviews = ref<Record<string, string>>({});
-
-onMounted(() => {
-  message.files?.forEach(async (file) => {
-    if (!isPdf(file.extension)) return;
-
-    let src: string | undefined;
-    try {
-      src = await getPdfPreview(file.url);
-    } catch {
-      src = undefined;
-    }
-
-    if (src) {
-      pdfPreviews.value[file.id] = src;
-    }
-  });
-});
-
-function isPdf(extension: string): boolean {
-  return extension === PDF_EXTENSION;
-}
-
-function isImage(extension: string): boolean {
-  return IMAGE_EXTENSIONS.includes(extension.toLowerCase());
-}
+const html = computed(() =>
+  DOMPurify.sanitize(marked.parse(message.text, { async: false, breaks: true })),
+);
 </script>
 
 <style lang="scss" scoped>
@@ -251,51 +208,6 @@ function isImage(extension: string): boolean {
     gap: 10px;
 
     width: calc(100% - 10px);
-  }
-
-  .file {
-    position: relative;
-
-    display: grid;
-    place-items: center;
-
-    width: 120px;
-    height: 120px;
-
-    border: 1px solid gray;
-    border-radius: 6px;
-
-    text-decoration: none;
-
-    &__extension {
-      position: absolute;
-      left: 20px;
-      bottom: 10px;
-      padding: 4px 8px;
-
-      background-color: gray;
-      border-radius: 2px;
-    }
-
-    &__preview {
-      width: 100%;
-      height: auto;
-    }
-
-    &--is-pdf {
-      background-size: cover;
-      background-position: top;
-      background-repeat: no-repeat;
-    }
-
-    &--image {
-      width: 100%;
-      height: auto;
-
-      .file__info {
-        display: none;
-      }
-    }
   }
 
   &--assistant {
