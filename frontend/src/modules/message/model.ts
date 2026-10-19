@@ -16,3 +16,5 @@ export interface Message {
   files?: MessageFile[];
   createdAt: string;
 }
+
+export type MessagePayload = Pick<Message, 'text' | 'files'>;

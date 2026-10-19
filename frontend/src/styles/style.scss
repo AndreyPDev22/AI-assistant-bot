@@ -26,6 +26,25 @@
   --font-size-lg: 2rem;
   --font-size-xl: 2.4rem;
   --font-size-2xl: 3.6rem;
+
+  --toastify-font-family: 'Inter', sans-serif;
+  --toastify-color-light: var(--color-pink-50);
+  --toastify-text-color-light: var(--color-pink-950);
+  --toastify-color-error: var(--color-pink-700);
+  --toastify-icon-color-error: var(--color-pink-700);
+  --toastify-color-progress-error: var(--color-pink-400);
+}
+
+.Toastify__toast {
+  border: 1px solid var(--color-pink-300);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.Toastify__toast * {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  color: var(--color-pink-950);
 }
 
 *,
