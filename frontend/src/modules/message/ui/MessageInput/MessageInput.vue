@@ -69,6 +69,8 @@
       <button
         class="message-input__send-message"
         aria-label="Отправить сообщение"
+        :disabled="!isExpanded"
+        @click="sendMessage"
       >
         <img
           src="./assets/send.svg"
@@ -81,12 +83,18 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, useTemplateRef } from 'vue';
-import type { MessageFile } from '../../model';
+
+import type { MessageFile, MessagePayload } from '../../model';
 import { useVoiceRecorder } from '../../lib/useVoiceRecorder';
+
 import FilePreview from '../FilePreview/FilePreview.vue';
 
-defineProps<{
+const { isDisabled } = defineProps<{
   isDisabled?: boolean;
+}>();
+
+const emit = defineEmits<{
+  send: [payload: MessagePayload];
 }>();
 
 const fileInput = useTemplateRef('fileInput');
@@ -139,6 +147,21 @@ function onFileChange(event: Event) {
 
   (event.target as HTMLInputElement).value = '';
 }
+
+function sendMessage() {
+  if (isDisabled || !isExpanded.value) {
+    return;
+  }
+
+  emit('send', { text: text.value, files: filesList.value });
+}
+
+function clear() {
+  text.value = '';
+  filesList.value = [];
+}
+
+defineExpose({ clear });
 </script>
 
 <style lang="scss" scoped>
@@ -198,6 +221,11 @@ function onFileChange(event: Event) {
   &__microphone,
   &__send-message {
     cursor: pointer;
+  }
+
+  &__send-message:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   &__microphone,
