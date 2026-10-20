@@ -84,7 +84,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, useTemplateRef } from 'vue';
 
-import type { MessageFile, MessagePayload } from '../../model';
+import type { MessageFile, MessagePayload } from '../../model/message.ts';
 import { useVoiceRecorder } from '../../lib/useVoiceRecorder';
 
 import FilePreview from '../FilePreview/FilePreview.vue';
