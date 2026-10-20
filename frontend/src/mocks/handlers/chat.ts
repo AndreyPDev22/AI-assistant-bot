@@ -108,8 +108,11 @@ export const chatApiHandlers = [
       return HttpResponse.json(errorResponse, { status: APIResponseStatus.NOT_FOUND });
     }
 
+    const isEmptyResponse = Math.random() < 0.5;
     const response: Envelope<unknown> = {
-      data: messages.map((message) => snakecaseKeys({ ...message }, { deep: true })),
+      data: isEmptyResponse
+        ? []
+        : messages.map((message) => snakecaseKeys({ ...message }, { deep: true })),
       error: null,
     };
     return HttpResponse.json(response);

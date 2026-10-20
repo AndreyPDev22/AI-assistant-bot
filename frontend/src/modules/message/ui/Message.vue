@@ -54,6 +54,8 @@ const html = computed(() =>
     line-height: 1.5;
     overflow-wrap: anywhere;
 
+    background-color: var(--color-white-50);
+
     > :deep(:first-child) {
       margin-top: 0;
     }

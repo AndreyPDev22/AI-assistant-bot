@@ -63,6 +63,31 @@
   text-align: left;
 }
 
+body {
+  position: relative;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: var(--color-white);
+}
+
+body::before {
+  position: fixed;
+  content: '';
+  top: 50%;
+  left: 50%;
+
+  width: 273px;
+  height: 273px;
+  transform: translate(-50%, -50%);
+
+  filter: blur(81px);
+  background: var(--color-pink-200);
+  border-radius: 50%;
+
+  pointer-events: none;
+  z-index: -1;
+}
+
 .container {
   padding: 0 30px;
 }
