@@ -1,5 +1,5 @@
 import { ref, onBeforeUnmount, type Ref } from 'vue';
-import type { MessageFile } from '../model';
+import type { MessageFile } from '../model/message';
 
 export type VolumeLevel = 1 | 2 | 3 | 4 | 5;
 

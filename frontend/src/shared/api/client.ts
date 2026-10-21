@@ -48,3 +48,7 @@ export async function apiRequest<T>(input: RequestInfo | URL, init?: RequestInit
 
   return data as T;
 }
+
+export function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof ApiError ? error.message : fallback;
+}

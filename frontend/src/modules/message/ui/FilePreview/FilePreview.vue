@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 
-import type { MessageFile } from '../../model';
+import type { MessageFile } from '../../model/message';
 import { getPdfPreview } from '../../lib/pdfPreview';
 
 import BASE_FILE_IMAGE from './assets/file.svg';
