@@ -14,7 +14,6 @@ export interface Message {
   senderRole: SenderRole;
   text: string;
   files?: MessageFile[];
-  createdAt: string;
 }
 
 export type MessagePayload = Pick<Message, 'text' | 'files'>;

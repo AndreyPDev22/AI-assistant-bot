@@ -24,7 +24,7 @@ import { computed } from 'vue';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
-import { SenderRole, type Message } from '../model/message.ts';
+import { SenderRole, type Message } from '../model/message';
 import FilePreview from './FilePreview/FilePreview.vue';
 
 const { message } = defineProps<{

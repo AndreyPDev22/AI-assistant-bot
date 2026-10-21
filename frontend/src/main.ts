@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
+import { router } from './router';
 import { setupMocks } from './mocks';
 import App from './App.vue';
 import 'vue3-toastify/dist/index.css';
@@ -11,7 +12,7 @@ async function mountApp() {
     await setupMocks();
   }
 
-  createApp(App).use(createPinia()).mount('#app');
+  createApp(App).use(createPinia()).use(router).mount('#app');
 }
 
 mountApp();

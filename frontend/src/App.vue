@@ -1,11 +1,19 @@
 <template>
+  <div class="container">
+    <Suspense>
+      <ChatsList />
+      <template #fallback>
+        <p>Загрузка чатов...</p>
+      </template>
+    </Suspense>
+  </div>
   <div class="container container--chat">
-    <Chat />
+    <RouterView />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Chat } from './modules/chat';
+import { ChatsList } from '@/modules/chat';
 </script>
 
 <style lang="scss" scoped>

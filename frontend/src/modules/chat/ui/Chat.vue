@@ -1,8 +1,15 @@
 <template>
   <div :class="['chat', { 'chat--empty': isEmptyMessagesList }]">
     <div class="chat__messages">
-      <Suspense @resolve="isMessagesLoaded = true">
-        <ChatMessages :chat-id="TEST_CHAT_ID" />
+      <Suspense
+        @pending="isMessagesLoaded = false"
+        @resolve="isMessagesLoaded = true"
+      >
+        <ChatMessages
+          v-if="chatId"
+          :key="chatId"
+          :chat-id
+        />
         <template #fallback>
           <p>Загрузка сообщений...</p>
         </template>
@@ -23,21 +30,22 @@
 
 <script setup lang="ts">
 import { ref, computed, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 
 import { MessageInput, type Message, type MessagePayload } from '@/modules/message';
 
-import { ApiError } from '@/shared/api/client';
+import { getErrorMessage } from '@/shared/api/client';
 
 import { useChatStore } from '../model/store';
+import { RouteNames } from '../routes';
 import ChatMessages from './ChatMessages.vue';
 
-const TEST_CHAT_ID = '1';
+const { chatId = undefined } = defineProps<{
+  chatId?: string;
+}>();
 
-function getErrorMessage(error: unknown, fallback: string) {
-  return error instanceof ApiError ? error.message : fallback;
-}
-
+const router = useRouter();
 const chatStore = useChatStore();
 
 const messageInput = useTemplateRef('messageInput');
@@ -45,22 +53,30 @@ const messageInput = useTemplateRef('messageInput');
 const isMessagesLoaded = ref(false);
 const isSendingMessage = ref(false);
 
-const isEmptyMessagesList = computed(() => isMessagesLoaded.value && !chatStore.messages.length);
+const isEmptyMessagesList = computed(() => {
+  return !chatId || (isMessagesLoaded.value && !chatStore.messages.length);
+});
 
 async function sendMessage(payload: MessagePayload) {
+  const sentChatId = chatId;
+
   isSendingMessage.value = true;
 
-  let response: Message | undefined;
+  let response: { chatId: string; message: Message } | undefined;
   try {
-    response = await chatStore.sendMessage(TEST_CHAT_ID, payload);
+    response = await chatStore.sendMessage(sentChatId, payload);
   } catch (error) {
     toast.error(getErrorMessage(error, 'Не удалось отправить сообщение'));
   } finally {
     isSendingMessage.value = false;
   }
 
-  if (response) {
+  if (response && sentChatId === chatId) {
     messageInput.value?.clear();
+
+    if (!sentChatId) {
+      router.push({ name: RouteNames.CHAT, params: { chatId: response.chatId } });
+    }
   }
 }
 </script>
