@@ -1,26 +1,43 @@
 <template>
-  <a
-    :href="file.url"
-    class="file"
-    download
-  >
-    <div class="file__info">
-      <img
-        :src="previewSrc"
-        :class="['file__preview', { 'file__preview--placeholder': previewSrc === BASE_FILE_IMAGE }]"
-        alt=""
-      />
-      <p class="file__name">
+  <div class="file">
+    <a
+      :href="file.url"
+      class="file__link"
+      download
+    >
+      <div class="file__info">
         <img
-          :src="BASE_FILE_IMAGE"
+          :src="previewSrc"
+          :class="[
+            'file__preview',
+            { 'file__preview--placeholder': previewSrc === BASE_FILE_IMAGE },
+          ]"
           alt=""
         />
-        <span>
-          {{ file.name }}
-        </span>
-      </p>
-    </div>
-  </a>
+        <p class="file__name">
+          <img
+            :src="BASE_FILE_IMAGE"
+            alt=""
+          />
+          <span>
+            {{ file.name }}
+          </span>
+        </p>
+      </div>
+    </a>
+    <button
+      v-if="deletable"
+      type="button"
+      class="file__delete"
+      aria-label="Удалить файл"
+      @click="$emit('delete', file.id)"
+    >
+      <img
+        src="./assets/close.svg"
+        alt=""
+      />
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -34,8 +51,13 @@ import BASE_FILE_IMAGE from './assets/file.svg';
 const PDF_EXTENSION = 'pdf';
 const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'avif'];
 
-const { file } = defineProps<{
+const { file, deletable = false } = defineProps<{
   file: MessageFile;
+  deletable?: boolean;
+}>();
+
+defineEmits<{
+  delete: [id: string];
 }>();
 
 const pdfPreview = ref<string>();
@@ -61,18 +83,40 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .file {
-  display: flex;
+  position: relative;
+
   place-self: center;
 
   width: 100px;
   height: 75px;
 
-  text-decoration: none;
+  &__link {
+    display: flex;
 
-  border: 1px solid #d3a0a5;
-  border-radius: 6px;
+    width: 100%;
+    height: 100%;
 
-  overflow: hidden;
+    text-decoration: none;
+
+    border: 1px solid #d3a0a5;
+    border-radius: 6px;
+
+    overflow: hidden;
+  }
+
+  &__delete {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+
+    display: flex;
+    padding: 0;
+
+    border: none;
+    background: none;
+
+    cursor: pointer;
+  }
 
   &__info {
     width: 100%;

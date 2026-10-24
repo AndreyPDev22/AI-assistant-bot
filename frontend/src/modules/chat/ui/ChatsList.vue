@@ -18,6 +18,7 @@
             <RouterLink
               class="chat__link"
               :to="{ name: RouteNames.CHAT, params: { chatId: chat.id } }"
+              @click="$emit('closeList')"
             >
               {{ chat.messages[0]?.text || 'Новый чат' }}
             </RouterLink>
@@ -63,10 +64,10 @@ const CHAT_GROUP_TYPE_TITLES: Record<ChatGroupType, string> = {
   [ChatGroupType.FAVORITE]: '♡ Избранное',
   [ChatGroupType.TODAY]: 'Сегодня',
   [ChatGroupType.YESTERDAY]: 'Вчера',
-  [ChatGroupType.LAST_WEEK]: 'На прошлой неделе',
-  [ChatGroupType.LAST_MONTH]: 'В прошлом месяце',
-  [ChatGroupType.LAST_YEAR]: 'В прошлом году',
-  [ChatGroupType.OTHER]: 'Старые чаты',
+  [ChatGroupType.LAST_WEEK]: 'За последнюю неделю',
+  [ChatGroupType.LAST_MONTH]: 'За последний месяц',
+  [ChatGroupType.LAST_YEAR]: 'За последний год',
+  [ChatGroupType.OTHER]: 'Ранее',
 };
 
 const CHAT_GROUP_MAX_AGE_IN_DAYS: [ChatGroupType, number][] = [
@@ -76,6 +77,10 @@ const CHAT_GROUP_MAX_AGE_IN_DAYS: [ChatGroupType, number][] = [
   [ChatGroupType.LAST_MONTH, 30],
   [ChatGroupType.LAST_YEAR, 365],
 ];
+
+defineEmits<{
+  closeList: [];
+}>();
 
 function getChatGroupType(chat: Chat, now: number): ChatGroupType {
   if (chat.isFavorite) {
@@ -128,6 +133,10 @@ const chatGroups = computed(() => {
 
 .chats-list {
   gap: 30px;
+  height: 100%;
+
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .chats-group {

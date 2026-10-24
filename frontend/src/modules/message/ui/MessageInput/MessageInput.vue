@@ -18,6 +18,8 @@
         v-for="file in filesList"
         :key="file.id"
         :file
+        deletable
+        @delete="removeFile"
       />
     </div>
     <div class="message-input__field">
@@ -161,10 +163,16 @@ function clear() {
   filesList.value = [];
 }
 
+function removeFile(id: string) {
+  filesList.value = filesList.value.filter((file) => file.id !== id);
+}
+
 defineExpose({ clear });
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/breakpoints' as *;
+
 .message-input {
   width: 100%;
   padding: 10px 11px 9px 19px;
@@ -362,6 +370,29 @@ defineExpose({ clear });
     .message-input__send-message img,
     .message-input__microphone {
       filter: brightness(0) invert(30%);
+    }
+  }
+
+  @include tablet {
+    padding: 15px;
+    border-radius: 12px;
+
+    &__microphone,
+    &__send-message {
+      width: 40px;
+      height: 40px;
+    }
+
+    &--recording {
+      padding-left: 15px;
+    }
+  }
+
+  @include desktop {
+    &__microphone,
+    &__send-message {
+      width: 31px;
+      height: 31px;
     }
   }
 
