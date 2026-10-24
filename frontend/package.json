@@ -16,6 +16,7 @@
     "prepare": "cd .. && husky frontend/.husky"
   },
   "dependencies": {
+    "@vueuse/core": "^15.0.0",
     "camelcase-keys": "^10.0.3",
     "dompurify": "^3.4.17",
     "marked": "^18.1.1",

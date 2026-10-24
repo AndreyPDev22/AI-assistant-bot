@@ -16,6 +16,11 @@
       </Suspense>
     </div>
     <div class="chat__welcome">
+      <img
+        class="chat__welcome-logo"
+        src="@/shared/assets/star.svg"
+        alt=""
+      />
       <h1 class="chat__welcome-title">AI-ассистент для студентов</h1>
     </div>
 
@@ -82,6 +87,8 @@ async function sendMessage(payload: MessagePayload) {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/breakpoints' as *;
+
 .chat {
   height: 100%;
   gap: 30px;
@@ -104,9 +111,17 @@ async function sendMessage(payload: MessagePayload) {
 
   &__welcome {
     display: none;
+    flex-direction: column;
+    gap: 10px;
 
     align-items: center;
     justify-content: center;
+  }
+
+  &__welcome-logo {
+    display: none;
+    width: 35px;
+    height: 35px;
   }
 
   &__welcome-title {
@@ -138,6 +153,47 @@ async function sendMessage(payload: MessagePayload) {
 
     .chat__welcome {
       display: flex;
+    }
+  }
+
+  @include tablet {
+    width: 100%;
+    max-width: 600px;
+    margin-inline: auto;
+
+    &__welcome-logo {
+      display: block;
+    }
+
+    &__welcome-title {
+      font-size: var(--font-size-2xl);
+      max-width: none;
+    }
+  }
+
+  @include desktop {
+    &__welcome-logo {
+      width: 37px;
+      height: 37px;
+    }
+
+    &__welcome-title {
+      font-size: var(--font-size-xl);
+    }
+
+    &--empty {
+      justify-content: center;
+      gap: 20px;
+
+      .chat__welcome {
+        flex: none;
+        flex-direction: row;
+        gap: 3px;
+      }
+
+      .chat__input {
+        margin-top: 0;
+      }
     }
   }
 }
