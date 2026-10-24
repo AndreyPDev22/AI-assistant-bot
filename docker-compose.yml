@@ -1,0 +1,9 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_USE_API_MOCK: ${VITE_USE_API_MOCK:-false}
+    ports:
+      - '8080:80'
+    restart: unless-stopped
