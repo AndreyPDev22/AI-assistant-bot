@@ -35,7 +35,12 @@
           </Suspense>
           <AddChatBtn @select="view = AppView.CHAT" />
         </template>
-        <div v-else-if="view === AppView.PROFILE">Профиль</div>
+        <div
+          v-else-if="view === AppView.PROFILE"
+          class="app__profile"
+        >
+          <RegistrationForm @registered="view = AppView.CHAT" />
+        </div>
       </main>
     </div>
   </div>
@@ -45,7 +50,7 @@
 import { computed, ref, watch } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 
-import { AppHeader, AppSidebar, AppView } from '@/widgets';
+import { AppHeader, AppSidebar, AppView, RegistrationForm } from '@/widgets';
 import { ChatsList, AddChatBtn } from '@/modules/chat';
 
 const TABLET_MIN_WIDTH = 744;
@@ -151,6 +156,13 @@ function onSidebarNavigate(target: AppView) {
     height: 100%;
   }
 
+  &__profile {
+    width: 100%;
+    max-width: 260px;
+    margin-inline: auto;
+    overflow-y: auto;
+  }
+
   @include tablet {
     &__backdrop {
       display: block;
@@ -158,6 +170,10 @@ function onSidebarNavigate(target: AppView) {
 
     &__main {
       padding-bottom: 40px;
+    }
+
+    &__profile {
+      max-width: 236px;
     }
 
     &__content::before {

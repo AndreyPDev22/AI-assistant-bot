@@ -1,5 +1,5 @@
 <template>
-  <div :class="['base-input', { 'base-input--required': required }]">
+  <div :class="['base-input', { 'base-input--optional': optional }]">
     <label
       v-if="placeholder"
       class="base-input__label"
@@ -9,6 +9,7 @@
     </label>
     <input
       :id
+      v-model="value"
       class="base-input__input"
       :class="`base-input__input--${size}`"
       :name
@@ -46,8 +47,11 @@ const {
   placeholder?: string;
   description?: string;
   required?: boolean;
+  optional?: boolean;
   size?: InputSize;
 }>();
+
+const value = defineModel<string>({ default: '' });
 
 const descriptionId = computed(() => `${id}-description`);
 </script>
@@ -88,7 +92,7 @@ const descriptionId = computed(() => `${id}-description`);
     }
   }
 
-  &--required::before {
+  &--optional::before {
     position: absolute;
     top: 0;
     left: -6px;
@@ -99,6 +103,8 @@ const descriptionId = computed(() => `${id}-description`);
   &__description {
     margin-top: 5px;
     font-size: 1rem;
+    line-height: 1.2;
+    color: var(--color-pink-600);
   }
 }
 </style>
