@@ -4,13 +4,13 @@
   font-size: 62.5%;
 
   --color-white: #ffffff;
-  --color-black: #000000;
   --color-white-50: #ffffff80;
   --color-black-50: #00000080;
   --color-shadow: #00000040;
 
   --color-pink-50: #f6e6e7;
   --color-pink-100: #f1d4d6;
+  --color-pink-150: #eecfd2;
   --color-pink-200: #eec9cd;
   --color-pink-300: #e0b9bd;
   --color-pink-400: #ba8c8c;
@@ -61,7 +61,7 @@
   line-height: 1;
   font-weight: 400;
   font-style: normal;
-  color: var(--color-black);
+  color: black;
   text-align: left;
 }
 
