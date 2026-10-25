@@ -3,6 +3,11 @@ export enum BtnVariant {
   OUTLINE = 'outline',
 }
 
+export enum BtnType {
+  BUTTON = 'button',
+  SUBMIT = 'submit',
+}
+
 export enum BtnSize {
   SM = 'sm',
   MD = 'md',

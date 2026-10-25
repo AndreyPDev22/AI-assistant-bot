@@ -1,7 +1,7 @@
 <template>
   <component
     :is="as"
-    :type="as === 'button' ? 'button' : undefined"
+    :type="as === 'button' ? type : undefined"
     :class="['base-btn', `base-btn--${size}`, `base-btn--${variant}`]"
   >
     <slot />
@@ -11,16 +11,18 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
 
-import { BtnSize, BtnVariant } from './types';
+import { BtnSize, BtnType, BtnVariant } from './types';
 
 const {
   as = 'button',
   variant = BtnVariant.PRIMARY,
   size = BtnSize.LG,
+  type = BtnType.BUTTON,
 } = defineProps<{
   as?: string | Component;
   variant?: BtnVariant;
   size?: BtnSize;
+  type?: BtnType;
 }>();
 </script>
 
