@@ -291,7 +291,7 @@ defineExpose({ clear });
       height: 33px;
 
       margin-left: 0;
-      padding: 4px 8px 4px 12px;
+      padding: 6px 1px 6px 13px;
 
       border-radius: 80px;
       background-color: #f4e2e4;
@@ -300,6 +300,10 @@ defineExpose({ clear });
     .message-input__microphone {
       background-color: #e0b9bd;
       background-image: url('./assets/microphone-play.svg');
+    }
+
+    .message-input__send-message {
+      margin-left: 10px;
     }
   }
 
@@ -345,9 +349,13 @@ defineExpose({ clear });
   }
 
   &__send-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     margin-left: 5px;
 
-    padding: 7px 10px;
+    padding: 0;
 
     background-color: var(--color-pink-300);
   }
@@ -373,29 +381,6 @@ defineExpose({ clear });
     }
   }
 
-  @include tablet {
-    padding: 15px;
-    border-radius: 12px;
-
-    &__microphone,
-    &__send-message {
-      width: 40px;
-      height: 40px;
-    }
-
-    &--recording {
-      padding-left: 15px;
-    }
-  }
-
-  @include desktop {
-    &__microphone,
-    &__send-message {
-      width: 31px;
-      height: 31px;
-    }
-  }
-
   &--expanded {
     padding-top: 20px;
 
@@ -413,6 +398,108 @@ defineExpose({ clear });
 
       .message-input__voice {
         margin-left: auto;
+      }
+    }
+  }
+
+  @include tablet {
+    &:not(.message-input--recording) {
+      gap: 15px;
+      min-height: 110px;
+      padding: 15px 10px 10px 15px;
+
+      border-radius: 12px;
+      background-color: var(--color-pink-100);
+      box-shadow: 2px 3px 7px var(--color-shadow);
+
+      &.message-input--disabled {
+        background-color: #f6e7e8;
+      }
+
+      .message-input__field {
+        flex: 1;
+        align-content: space-between;
+        row-gap: 15px;
+      }
+
+      .message-input__input {
+        order: -1;
+        flex-basis: 100%;
+        margin: 0;
+      }
+
+      .message-input__files {
+        margin-right: 0;
+      }
+
+      .message-input__voice {
+        margin-left: auto;
+      }
+
+      .message-input__upload-file img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .message-input__microphone,
+      .message-input__send-message {
+        width: 40px;
+        height: 40px;
+      }
+
+      .message-input__microphone {
+        background-size: 18px 27px;
+      }
+
+      .message-input__send-message {
+        margin-left: 9px;
+
+        img {
+          width: 13px;
+          height: 21px;
+        }
+      }
+    }
+  }
+
+  @include desktop {
+    &:not(.message-input--recording) {
+      padding-right: 20px;
+
+      .message-input__upload-file img {
+        width: 18px;
+        height: 18px;
+      }
+
+      .message-input__microphone,
+      .message-input__send-message {
+        width: 31px;
+        height: 31px;
+      }
+
+      .message-input__microphone {
+        background-size: 16px 23px;
+      }
+
+      .message-input__send-message {
+        margin-left: 8px;
+
+        img {
+          width: 10px;
+          height: 17px;
+        }
+      }
+    }
+
+    &--recording {
+      padding: 15px 20px 15px 15px;
+
+      border-radius: 12px;
+      background-color: var(--color-pink-100);
+      box-shadow: 2px 3px 7px var(--color-shadow);
+
+      .message-input__send-message {
+        margin-left: 15px;
       }
     }
   }

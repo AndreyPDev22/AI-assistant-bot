@@ -17,6 +17,7 @@
         name="last_name"
         placeholder="Фамилия"
         required
+        :error-text="errors.lastName"
       />
       <BaseInput
         id="registration-first-name"
@@ -24,6 +25,7 @@
         name="first_name"
         placeholder="Имя"
         required
+        :error-text="errors.firstName"
       />
       <BaseInput
         id="registration-middle-name"
@@ -31,6 +33,7 @@
         name="middle_name"
         placeholder="Отчество"
         optional
+        :error-text="errors.middleName"
       />
       <BaseInput
         id="registration-group"
@@ -39,6 +42,7 @@
         placeholder="Номер группы"
         description="(формат 261-321)"
         required
+        :error-text="errors.group"
       />
       <hr class="registration-form__divider" />
       <BaseInput
@@ -48,6 +52,7 @@
         type="email"
         placeholder="Адрес электронной почты"
         required
+        :error-text="errors.email"
       />
       <BaseInput
         id="registration-password"
@@ -56,6 +61,7 @@
         type="password"
         placeholder="Придумайте пароль"
         required
+        :error-text="errors.password"
       />
     </div>
 
@@ -85,7 +91,7 @@ const emit = defineEmits<{
   registered: [user: User];
 }>();
 
-const { defineField, handleSubmit, meta, isSubmitting } = useForm({
+const { defineField, handleSubmit, meta, isSubmitting, errors } = useForm({
   validationSchema: toTypedSchema(registerSchema),
   initialValues: {
     lastName: '',
@@ -124,7 +130,7 @@ const onSubmit = handleSubmit(async (values) => {
   width: 100%;
 
   &__title {
-    margin-bottom: 13px;
+    margin-bottom: 10px;
 
     font-family: 'Montserrat', sans-serif;
     font-size: var(--font-size-xl);
@@ -145,14 +151,14 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   &__divider {
-    margin-bottom: 9px;
+    margin-bottom: 4px;
 
     border: none;
     border-top: 1px solid var(--color-pink-600);
   }
 
   &__note {
-    margin-top: 10px;
+    margin-top: 2px;
 
     font-size: 1rem;
     line-height: 1.2;

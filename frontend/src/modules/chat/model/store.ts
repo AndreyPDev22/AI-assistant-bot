@@ -1,7 +1,9 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
+import { toast } from 'vue3-toastify';
 
 import type { Message, MessagePayload } from '@/modules/message';
+import { APIResponseStatus } from '@/shared/api/client';
 
 import { chatApi } from '../api/chat';
 import type { Chat } from './chat';
@@ -74,5 +76,27 @@ export const useChatStore = defineStore('chat', () => {
     return chatId ? sendMessageToChat(chatId, payload) : sendMessageToNewChat(payload);
   }
 
-  return { chats, messages, fetchChats, fetchMessages, sendMessage };
+  async function toggleFavorite(chatId: string) {
+    let response: Chat;
+
+    try {
+      response = await chatApi.toggleFavorite(chatId);
+    } catch {
+      toast.error('Не удалось изменить статус чата');
+      return;
+    }
+
+    if (response) {
+      chats.value = chats.value.map((chat) => (chat.id === chatId ? response : chat));
+    }
+  }
+
+  async function deleteChat(chatId: string) {
+    const response = await chatApi.deleteChat(chatId);
+    if (response.status === APIResponseStatus.NO_CONTENT) {
+      chats.value = chats.value.filter((chat) => chat.id !== chatId);
+    }
+  }
+
+  return { chats, messages, fetchChats, fetchMessages, sendMessage, deleteChat, toggleFavorite };
 });
