@@ -617,4 +617,55 @@ export const chatApiHandlers = [
 
     return HttpResponse.json(response, { status: APIResponseStatus.CREATED });
   }),
+
+  http.patch('/api/chats/:chatId/favorite', async ({ params }) => {
+    const chatId = String(params.chatId);
+
+    await delay(500);
+
+    const chat = MOCK_CHATS.find((mockChat) => mockChat.id === chatId);
+
+    if (!chat) {
+      const errorResponse: Envelope<null> = {
+        data: null,
+        error: {
+          code: APIResponseStatus.NOT_FOUND,
+          message: `Чат ${chatId} не найден`,
+        },
+      };
+      return HttpResponse.json(errorResponse, { status: APIResponseStatus.NOT_FOUND });
+    }
+
+    chat.isFavorite = !chat.isFavorite;
+
+    const response: Envelope<unknown> = {
+      data: snakecaseKeys({ ...chat }, { deep: true }),
+      error: null,
+    };
+    return HttpResponse.json(response);
+  }),
+
+  http.delete('/api/chats/:chatId', async ({ params }) => {
+    const chatId = String(params.chatId);
+
+    await delay(500);
+
+    const index = MOCK_CHATS.findIndex((mockChat) => mockChat.id === chatId);
+
+    if (index === -1) {
+      const errorResponse: Envelope<null> = {
+        data: null,
+        error: {
+          code: APIResponseStatus.NOT_FOUND,
+          message: `Чат ${chatId} не найден`,
+        },
+      };
+      return HttpResponse.json(errorResponse, { status: APIResponseStatus.NOT_FOUND });
+    }
+
+    MOCK_CHATS.splice(index, 1);
+    MOCK_CHAT_MESSAGES.delete(chatId);
+
+    return new HttpResponse(null, { status: APIResponseStatus.NO_CONTENT });
+  }),
 ];

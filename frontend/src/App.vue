@@ -1,4 +1,7 @@
 <template>
+  <Transition name="app-loader">
+    <AppLoader v-if="!isFontsLoaded" />
+  </Transition>
   <div class="app">
     <template v-if="isTablet">
       <AppSidebar
@@ -47,17 +50,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { useMediaQuery } from '@vueuse/core';
+import { ref, computed, watch, onMounted } from 'vue';
+import { promiseTimeout, useMediaQuery } from '@vueuse/core';
 
-import { AppHeader, AppSidebar, AppView, RegistrationForm } from '@/widgets';
+import { AppHeader, AppLoader, AppSidebar, AppView, RegistrationForm } from '@/widgets';
 import { ChatsList, AddChatBtn } from '@/modules/chat';
 
 const TABLET_MIN_WIDTH = 744;
 const DESKTOP_MIN_WIDTH = 1440;
+const MIN_LOADER_DURATION = 1000;
 
 const isTablet = useMediaQuery(`(min-width: ${TABLET_MIN_WIDTH}px)`);
 const isDesktop = useMediaQuery(`(min-width: ${DESKTOP_MIN_WIDTH}px)`);
+
+const isFontsLoaded = ref(false);
 
 const view = ref(AppView.CHAT);
 const isSidebarOpen = ref(isDesktop.value);
@@ -74,6 +80,11 @@ watch(isTablet, (value) => {
   if (value && view.value === AppView.LIST) {
     view.value = AppView.CHAT;
   }
+});
+
+onMounted(async () => {
+  await Promise.all([document.fonts.ready, promiseTimeout(MIN_LOADER_DURATION)]);
+  isFontsLoaded.value = true;
 });
 
 function onMenuClick() {
@@ -96,6 +107,14 @@ function onSidebarNavigate(target: AppView) {
 <style lang="scss" scoped>
 @use '@/styles/breakpoints' as *;
 
+.app-loader-leave-active {
+  transition: opacity 0.3s;
+}
+
+.app-loader-leave-to {
+  opacity: 0;
+}
+
 .app {
   display: flex;
   height: 100dvh;
@@ -116,9 +135,39 @@ function onSidebarNavigate(target: AppView) {
     align-items: center;
     flex: 1;
 
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
     height: 100dvh;
     min-width: 0;
     padding: 30px 30px 25px;
+
+    &::before {
+      --spot-size: 597px;
+
+      position: absolute;
+      content: '';
+      top: 50%;
+      left: 50%;
+
+      width: var(--spot-size);
+      height: var(--spot-size);
+      transform: translate(-50%, -50%);
+
+      background: radial-gradient(
+        closest-side,
+        color-mix(in srgb, var(--color-pink-200) 75%, transparent) 0%,
+        color-mix(in srgb, var(--color-pink-200) 68%, transparent) 25%,
+        color-mix(in srgb, var(--color-pink-200) 50%, transparent) 45%,
+        color-mix(in srgb, var(--color-pink-200) 25%, transparent) 65%,
+        color-mix(in srgb, var(--color-pink-200) 6%, transparent) 85%,
+        transparent 100%
+      );
+
+      pointer-events: none;
+      z-index: -1;
+    }
   }
 
   &__content {
@@ -129,27 +178,6 @@ function onSidebarNavigate(target: AppView) {
     flex: 1;
     display: flex;
     flex-direction: column;
-
-    position: relative;
-    isolation: isolate;
-
-    &::before {
-      position: absolute;
-      content: '';
-      top: 50%;
-      left: 50%;
-
-      width: 273px;
-      height: 273px;
-      transform: translate(-50%, -50%);
-
-      filter: blur(81px);
-      background: var(--color-pink-200);
-      border-radius: 50%;
-
-      pointer-events: none;
-      z-index: -1;
-    }
   }
 
   &__loading {
@@ -170,15 +198,14 @@ function onSidebarNavigate(target: AppView) {
 
     &__main {
       padding-bottom: 40px;
+
+      &::before {
+        --spot-size: 1048px;
+      }
     }
 
     &__profile {
       max-width: 236px;
-    }
-
-    &__content::before {
-      width: 488px;
-      height: 488px;
     }
   }
 
@@ -189,15 +216,14 @@ function onSidebarNavigate(target: AppView) {
 
     &__main {
       padding-top: 40px;
+
+      &::before {
+        --spot-size: 1444px;
+      }
     }
 
     &__content {
       margin-top: 0;
-
-      &::before {
-        width: 645px;
-        height: 645px;
-      }
     }
   }
 }

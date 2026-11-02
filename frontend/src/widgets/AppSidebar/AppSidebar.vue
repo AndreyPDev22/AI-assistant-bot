@@ -166,7 +166,8 @@ defineEmits<{
   .chats {
     flex: 1;
     min-height: 0;
-    margin-top: 30px;
+    margin: 30px -10px 0;
+    padding-inline: 10px;
     overflow-y: auto;
 
     &__loading {
@@ -197,6 +198,11 @@ defineEmits<{
     position: static;
     transform: none;
     visibility: visible;
+    padding-bottom: 15px;
+
+    :deep(.add-chat-btn) {
+      margin-top: 15px;
+    }
 
     &:not(.sidebar--open) {
       align-items: center;
@@ -216,6 +222,7 @@ defineEmits<{
 
       :deep(.add-chat-btn) {
         width: 48px;
+        margin-top: 20px;
         padding-inline: 0;
 
         span {

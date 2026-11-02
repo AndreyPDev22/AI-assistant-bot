@@ -12,6 +12,7 @@
     </div>
     <!-- eslint-disable vue/no-v-html -- html очищен через DOMPurify -->
     <div
+      v-if="html"
       class="message__content"
       v-html="html"
     />
@@ -37,6 +38,8 @@ const html = computed(() =>
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/breakpoints' as *;
+
 .message {
   display: flex;
   flex-direction: column;

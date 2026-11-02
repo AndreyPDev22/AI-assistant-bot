@@ -1,6 +1,6 @@
 import type { Message, MessagePayload } from '@/modules/message';
 
-import { apiRequest } from '@/shared/api/client';
+import { apiRequest, APIResponseStatus } from '@/shared/api/client';
 
 import type { Chat } from '../model/chat';
 
@@ -25,5 +25,21 @@ export const chatApi = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+  },
+
+  toggleFavorite: (chatId: string) => {
+    return apiRequest<Chat>(`/api/chats/${chatId}/favorite`, { method: 'PATCH' });
+  },
+
+  deleteChat: async (chatId: string) => {
+    try {
+      await apiRequest(`/api/chats/${chatId}`, {
+        method: 'DELETE',
+      });
+    } catch {
+      return { status: APIResponseStatus.INTERNAL_SERVER_ERROR };
+    }
+
+    return { status: APIResponseStatus.NO_CONTENT };
   },
 };

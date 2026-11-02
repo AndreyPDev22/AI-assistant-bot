@@ -9,6 +9,7 @@
       />
       <img
         v-else
+        class="photo-select__placeholder"
         src="./assets/user.svg"
         alt=""
       />
@@ -67,8 +68,8 @@ function onChange(event: Event) {
   position: relative;
   display: block;
 
-  width: 123px;
-  height: 123px;
+  width: 110px;
+  height: 110px;
 
   cursor: pointer;
 
@@ -91,17 +92,22 @@ function onChange(event: Event) {
     object-fit: cover;
   }
 
+  &__placeholder {
+    width: 56px;
+    height: 72px;
+  }
+
   &__edit {
     position: absolute;
-    right: 5px;
-    bottom: 5px;
+    right: 4px;
+    bottom: 4px;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 
     border-radius: 50%;
     background-color: var(--color-pink-300);

@@ -162,6 +162,7 @@ onMounted(async () => {
   &__preview {
     width: 100%;
     height: 55px;
+    object-fit: contain;
 
     &--placeholder {
       object-fit: none;

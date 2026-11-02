@@ -10,8 +10,11 @@
     <input
       :id
       v-model="value"
-      class="base-input__input"
-      :class="`base-input__input--${size}`"
+      :class="[
+        'base-input__input',
+        `base-input__input--${size}`,
+        { 'base-input__input--error': errorText },
+      ]"
       :name
       :type
       :placeholder
@@ -24,6 +27,12 @@
       class="base-input__description"
     >
       {{ description }}
+    </p>
+    <p
+      v-if="errorText"
+      class="base-input__error-text"
+    >
+      {{ errorText }}
     </p>
   </div>
 </template>
@@ -39,6 +48,7 @@ const {
   type = 'text',
   placeholder = '',
   description = '',
+  errorText = '',
   size = InputSize.MD,
 } = defineProps<{
   id: string;
@@ -49,6 +59,7 @@ const {
   required?: boolean;
   optional?: boolean;
   size?: InputSize;
+  errorText?: string;
 }>();
 
 const value = defineModel<string>({ default: '' });
@@ -90,6 +101,10 @@ const descriptionId = computed(() => `${id}-description`);
     &::placeholder {
       color: var(--color-pink-600);
     }
+
+    &--error {
+      border-color: #c21122;
+    }
   }
 
   &--optional::before {
@@ -105,6 +120,23 @@ const descriptionId = computed(() => `${id}-description`);
     font-size: 1rem;
     line-height: 1.2;
     color: var(--color-pink-600);
+  }
+
+  &__error-text {
+    position: absolute;
+    bottom: -33px;
+    left: 0;
+    right: 0;
+
+    padding-block: 7px;
+
+    text-align: center;
+    color: #a51a27;
+
+    border: 1px solid #a51a27;
+    background-color: white;
+
+    z-index: 100;
   }
 }
 </style>

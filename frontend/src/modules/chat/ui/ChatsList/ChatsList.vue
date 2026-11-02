@@ -10,19 +10,15 @@
       >
         <p class="chats-group__title">{{ CHAT_GROUP_TYPE_TITLES[type] }}</p>
         <ul class="chats-group__chats">
-          <li
+          <ChatItem
             v-for="chat in chatGroups[type]"
             :key="chat.id"
-            class="chat"
-          >
-            <RouterLink
-              class="chat__link"
-              :to="{ name: RouteNames.CHAT, params: { chatId: chat.id } }"
-              @click="$emit('closeList')"
-            >
-              {{ chat.messages[0]?.text || 'Новый чат' }}
-            </RouterLink>
-          </li>
+            :chat="chat"
+            :opened="openedChatId === chat.id"
+            @open="openedChatId = chat.id"
+            @close="openedChatId = null"
+            @navigate="$emit('closeList')"
+          />
         </ul>
       </li>
     </template>
@@ -30,15 +26,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { toast } from 'vue3-toastify';
 
 import { getErrorMessage } from '@/shared/api/client';
 import { MILLISECONDS_IN_DAY } from '@/shared/constants';
 
-import { useChatStore } from '../model/store';
-import { RouteNames } from '../routes';
-import type { Chat } from '../model/chat';
+import { useChatStore } from '../../model/store';
+import type { Chat } from '../../model/chat';
+import ChatItem from './ChatItem.vue';
 
 enum ChatGroupType {
   FAVORITE = 'favorite',
@@ -77,6 +73,8 @@ const CHAT_GROUP_MAX_AGE_IN_DAYS: [ChatGroupType, number][] = [
   [ChatGroupType.LAST_MONTH, 30],
   [ChatGroupType.LAST_YEAR, 365],
 ];
+
+const openedChatId = ref<string | null>(null);
 
 defineEmits<{
   closeList: [];
@@ -132,8 +130,11 @@ const chatGroups = computed(() => {
 }
 
 .chats-list {
-  gap: 30px;
+  gap: 25px;
   height: 100%;
+
+  margin-inline: -10px;
+  padding-inline: 10px;
 
   overflow-y: auto;
   scrollbar-width: none;
@@ -142,33 +143,13 @@ const chatGroups = computed(() => {
 .chats-group {
   &__title {
     font-size: var(--font-size-md);
-    font-weight: 400;
+    line-height: 1.2;
+    font-weight: 500;
     color: var(--color-pink-600);
   }
 
   &__chats {
-    margin-top: 15px;
-    gap: 10px;
-  }
-}
-
-.chat {
-  line-height: 1.2;
-
-  &__link {
-    display: block;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    color: inherit;
-    text-decoration: none;
-
-    &:hover,
-    &.router-link-active {
-      color: var(--color-pink-600);
-    }
+    margin-top: 10px;
   }
 }
 </style>

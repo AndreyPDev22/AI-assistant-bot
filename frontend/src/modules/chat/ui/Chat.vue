@@ -161,6 +161,10 @@ async function sendMessage(payload: MessagePayload) {
     max-width: 600px;
     margin-inline: auto;
 
+    &__welcome {
+      gap: 5px;
+    }
+
     &__welcome-logo {
       display: block;
     }
