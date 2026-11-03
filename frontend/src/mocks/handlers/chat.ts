@@ -9,6 +9,18 @@ import { APIResponseStatus, type Envelope } from '@/shared/api/client';
 
 const IS_RANDOM_EMPTY_CHATS_ENABLED = false;
 
+const MIN_ASSISTANT_ATTEMPTS = 1;
+const MAX_ASSISTANT_ATTEMPTS = 10;
+const ASSISTANT_ATTEMPT_DELAY_MS = 300;
+
+const ASSISTANT_REPLIES = [
+  'Понял вас. Уточните, пожалуйста, детали.',
+  'Хороший вопрос! Вот что я думаю…',
+  'Сейчас разберусь и отвечу.',
+  'Спасибо, что поделились. Продолжим?',
+  'Могу помочь с этим. С чего начнём?',
+];
+
 const MOCK_CHAT_MESSAGES = new Map<string, Message[]>([
   [
     '1',
@@ -502,6 +514,23 @@ function sortMockChats() {
 
 sortMockChats();
 
+function randomAttempts() {
+  return (
+    Math.floor(Math.random() * (MAX_ASSISTANT_ATTEMPTS - MIN_ASSISTANT_ATTEMPTS + 1)) +
+    MIN_ASSISTANT_ATTEMPTS
+  );
+}
+
+async function waitAssistant(attempts: number) {
+  for (let i = 0; i < attempts; i++) {
+    await delay(ASSISTANT_ATTEMPT_DELAY_MS);
+  }
+}
+
+function pickAssistantReply() {
+  return ASSISTANT_REPLIES[Math.floor(Math.random() * ASSISTANT_REPLIES.length)];
+}
+
 export const chatApiHandlers = [
   http.get('/api/chats', async () => {
     await delay(500);
@@ -609,6 +638,22 @@ export const chatApiHandlers = [
       chat.updatedAt = new Date().toISOString();
       sortMockChats();
     }
+
+    void (async () => {
+      const attempts = randomAttempts();
+      await waitAssistant(attempts);
+
+      messages.push({
+        id: crypto.randomUUID(),
+        senderRole: SenderRole.ASSISTANT,
+        text: pickAssistantReply() || 'Не понял вопрос',
+      });
+
+      if (chat) {
+        chat.updatedAt = new Date().toISOString();
+        sortMockChats();
+      }
+    })();
 
     const response: Envelope<unknown> = {
       data: snakecaseKeys({ ...message }, { deep: true }),

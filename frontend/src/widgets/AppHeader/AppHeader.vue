@@ -21,12 +21,12 @@
       />
     </RouterLink>
     <button
-      class="header__account"
+      :class="['header__account', { 'header__account--default': userPhoto === DEFAULT_USER_PHOTO }]"
       :aria-label="accountAriaLabel"
       @click="toggleView(AppView.PROFILE)"
     >
       <img
-        src="./assets/user.svg"
+        :src="userPhoto"
         alt=""
       />
     </button>
@@ -35,7 +35,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
+
+import { useAuthStore } from '@/modules/user';
+
 import { AppView } from './types';
+
+import DEFAULT_USER_PHOTO from './assets/user.svg';
 
 const view = defineModel<AppView>({ default: AppView.CHAT });
 
@@ -47,6 +53,9 @@ defineEmits<{
   menuClick: [];
 }>();
 
+const { user } = storeToRefs(useAuthStore());
+
+const userPhoto = computed(() => user.value?.photoUrl ?? DEFAULT_USER_PHOTO);
 const burgerMenuAriaLabel = computed(() => (isMenuOpen ? 'Скрыть меню' : 'Открыть меню'));
 const accountAriaLabel = computed(() =>
   view.value === AppView.PROFILE ? 'Закрыть профиль' : 'Открыть профиль',
@@ -113,10 +122,19 @@ function toggleView(target: AppView.PROFILE) {
     justify-self: end;
 
     img {
-      width: 14px;
-      height: 19px;
+      width: 32px;
+      height: 32px;
 
-      filter: brightness(0);
+      border-radius: 50%;
+    }
+
+    &--default {
+      img {
+        width: 14px;
+        height: 32px;
+
+        filter: brightness(0);
+      }
     }
   }
 

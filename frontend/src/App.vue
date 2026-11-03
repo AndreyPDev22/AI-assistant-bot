@@ -8,8 +8,8 @@
         :is-open="isSidebarOpen"
         @open="isSidebarOpen = true"
         @close="isSidebarOpen = false"
-        @navigate="onSidebarNavigate(AppView.CHAT)"
-        @open-profile="onSidebarNavigate(AppView.PROFILE)"
+        @navigate="view = AppView.CHAT"
+        @toggle-profile="isOpenProfile = !isOpenProfile"
       />
       <div
         v-if="isSidebarOpen"
@@ -26,10 +26,15 @@
       />
 
       <main class="app__content">
-        <KeepAlive>
-          <RouterView v-if="view === AppView.CHAT" />
-        </KeepAlive>
-        <template v-if="view === AppView.LIST">
+        <RouterView
+          v-if="view === AppView.CHAT"
+          v-slot="{ Component }"
+        >
+          <KeepAlive>
+            <component :is="Component" />
+          </KeepAlive>
+        </RouterView>
+        <template v-else-if="view === AppView.LIST">
           <Suspense>
             <ChatsList @close-list="view = AppView.CHAT" />
             <template #fallback>
@@ -39,10 +44,18 @@
           <AddChatBtn @select="view = AppView.CHAT" />
         </template>
         <div
-          v-else-if="view === AppView.PROFILE"
+          v-if="isOpenProfile || (view === AppView.PROFILE && !isTablet)"
           class="app__profile"
         >
-          <RegistrationForm @registered="view = AppView.CHAT" />
+          <Teleport
+            to=".sidebar__profile-container"
+            :disabled="!isTablet"
+          >
+            <AuthPage
+              v-if="!isAuthenticated"
+              v-click-outside="() => (isOpenProfile = false)"
+            />
+          </Teleport>
         </div>
       </main>
     </div>
@@ -51,22 +64,32 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import clickOutside from 'click-outside-vue3';
 import { promiseTimeout, useMediaQuery } from '@vueuse/core';
 
-import { AppHeader, AppLoader, AppSidebar, AppView, RegistrationForm } from '@/widgets';
+import { AppHeader, AppLoader, AppSidebar, AppView, AuthPage } from '@/widgets';
+
 import { ChatsList, AddChatBtn } from '@/modules/chat';
+import { useAuthStore } from '@/modules/user';
 
 const TABLET_MIN_WIDTH = 744;
 const DESKTOP_MIN_WIDTH = 1440;
 const MIN_LOADER_DURATION = 1000;
 
+const vClickOutside = clickOutside.directive;
+
 const isTablet = useMediaQuery(`(min-width: ${TABLET_MIN_WIDTH}px)`);
 const isDesktop = useMediaQuery(`(min-width: ${DESKTOP_MIN_WIDTH}px)`);
+
+const { isAuthenticated } = storeToRefs(useAuthStore());
 
 const isFontsLoaded = ref(false);
 
 const view = ref(AppView.CHAT);
 const isSidebarOpen = ref(isDesktop.value);
+
+const isOpenProfile = ref(false);
 
 const isMenuOpen = computed(() =>
   isTablet.value ? isSidebarOpen.value : view.value === AppView.LIST,
@@ -92,14 +115,6 @@ function onMenuClick() {
     isSidebarOpen.value = !isSidebarOpen.value;
   } else {
     view.value = view.value === AppView.LIST ? AppView.CHAT : AppView.LIST;
-  }
-}
-
-function onSidebarNavigate(target: AppView) {
-  view.value = target;
-
-  if (!isDesktop.value) {
-    isSidebarOpen.value = false;
   }
 }
 </script>
@@ -186,7 +201,6 @@ function onSidebarNavigate(target: AppView) {
 
   &__profile {
     width: 100%;
-    max-width: 260px;
     margin-inline: auto;
     overflow-y: auto;
   }
@@ -202,10 +216,6 @@ function onSidebarNavigate(target: AppView) {
       &::before {
         --spot-size: 1048px;
       }
-    }
-
-    &__profile {
-      max-width: 236px;
     }
   }
 

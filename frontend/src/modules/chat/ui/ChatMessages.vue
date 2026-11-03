@@ -4,6 +4,15 @@
     :key="message.id"
     :message
   />
+
+  <div
+    v-if="isAwaitingAssistant"
+    class="typing-indicator"
+  >
+    <span class="typing-indicator__dot" />
+    <span class="typing-indicator__dot" />
+    <span class="typing-indicator__dot" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -15,8 +24,9 @@ import { getErrorMessage } from '@/shared/api/client';
 
 import { useChatStore } from '../model/store';
 
-const { chatId } = defineProps<{
+const { chatId, isAwaitingAssistant = false } = defineProps<{
   chatId: string;
+  isAwaitingAssistant?: boolean;
 }>();
 
 const chatStore = useChatStore();
@@ -27,3 +37,48 @@ try {
   toast.error(getErrorMessage(error, 'Не удалось загрузить сообщения'));
 }
 </script>
+
+<style lang="scss" scoped>
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  align-self: flex-start;
+  padding: 12px 16px;
+
+  border-radius: 16px;
+  background-color: var(--color-pink-100);
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+    background-color: var(--color-pink-600);
+
+    animation: typing-bounce 1.2s infinite ease-in-out;
+
+    &:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+  }
+}
+
+@keyframes typing-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+</style>

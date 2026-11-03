@@ -76,13 +76,14 @@ export function useVoiceRecorder(
   }
 
   function onRecordingStop() {
-    const mimeType = mediaRecorder?.mimeType ?? 'audio/webm';
-    const blob = new Blob(chunks, { type: mimeType });
-    const extension = mimeType.split('/')[1]?.split(';')[0] ?? 'webm';
+    const MIME_TYPE = 'audio/mp3';
+    const EXTENSION = 'mp3';
+
+    const blob = new Blob(chunks, { type: MIME_TYPE });
 
     onRecorded({
       id: crypto.randomUUID(),
-      name: `voice-message.${extension}`,
+      name: `voice-message.${EXTENSION}`,
       url: URL.createObjectURL(blob),
     });
 

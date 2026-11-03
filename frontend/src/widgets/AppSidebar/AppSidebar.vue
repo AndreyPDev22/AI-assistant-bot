@@ -35,21 +35,30 @@
     <button
       class="sidebar__user"
       aria-label="Открыть профиль"
-      @click="$emit('openProfile')"
+      @click="$emit('toggleProfile')"
     >
-      <span class="sidebar__user-avatar">
-        <img
-          src="../AppHeader/assets/user.svg"
-          alt=""
-        />
-      </span>
-      <span class="sidebar__user-name">Пользователь</span>
+      <img
+        :class="[
+          'sidebar__user-avatar',
+          { 'sidebar__user-avatar--default': userPhoto === DEFAULT_USER_IMAGE },
+        ]"
+        :src="userPhoto"
+        alt=""
+      />
+      <span class="sidebar__user-name">{{ userName }}</span>
     </button>
+    <div class="sidebar__profile-container"></div>
   </aside>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
+
 import { AddChatBtn, ChatsList } from '@/modules/chat';
+import { useAuthStore } from '@/modules/user';
+
+import DEFAULT_USER_IMAGE from './assets/account.svg';
 
 defineProps<{
   isOpen: boolean;
@@ -59,14 +68,32 @@ defineEmits<{
   open: [];
   close: [];
   navigate: [];
-  openProfile: [];
+  toggleProfile: [];
 }>();
+
+const { user } = storeToRefs(useAuthStore());
+
+const userPhoto = computed(() => user.value?.photoUrl ?? DEFAULT_USER_IMAGE);
+const userName = computed(() => {
+  const nameParts = [];
+
+  if (user.value?.lastName) {
+    nameParts.push(user.value.lastName);
+  }
+  if (user.value?.firstName) {
+    nameParts.push(user.value.firstName);
+  }
+
+  const fullName = nameParts.join(' ');
+  return fullName || 'Гость';
+});
 </script>
 
 <style lang="scss" scoped>
 @use '@/styles/breakpoints' as *;
 
 .sidebar {
+  position: relative;
   display: none;
   flex-direction: column;
   flex-shrink: 0;
@@ -127,6 +154,8 @@ defineEmits<{
   }
 
   &__user {
+    position: relative;
+
     display: flex;
     align-items: center;
     gap: 12px;
@@ -152,15 +181,30 @@ defineEmits<{
     border-radius: 50%;
     background-color: var(--color-pink-300);
 
-    img {
-      width: 14px;
-      height: 19px;
+    &--default {
+      padding: 8px 12px;
     }
   }
 
   &__user-name {
     font-size: var(--font-size-lg);
     font-weight: 500;
+  }
+
+  &__profile-container {
+    &:has(*) {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: calc(100% - 76px);
+
+      padding: 20px 15px;
+      transform: translateY(-100%);
+
+      border-radius: 11px;
+      background-color: white;
+      box-shadow: 2px 2px 6.7px 0px #ba9b9d;
+    }
   }
 
   .chats {
@@ -176,8 +220,7 @@ defineEmits<{
   }
 
   @include tablet {
-    display: flex;
-    position: fixed;
+    display: none;
     top: 0;
     left: 0;
     z-index: 10;
@@ -189,13 +232,13 @@ defineEmits<{
       visibility 0.3s;
 
     &--open {
+      display: flex;
       transform: none;
       visibility: visible;
     }
   }
 
   @include desktop {
-    position: static;
     transform: none;
     visibility: visible;
     padding-bottom: 15px;
