@@ -73,6 +73,7 @@
     >
       Зарегистрироваться
     </BaseBtn>
+    <BaseBtn @click="$emit('openAuth')"> Войти </BaseBtn>
   </form>
 </template>
 
@@ -82,13 +83,13 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { toast } from 'vue3-toastify';
 
-import { registerSchema, userApi, type User } from '@/modules/user';
+import { registerSchema, useAuthStore } from '@/modules/user';
 
 import { getErrorMessage } from '@/shared/api/client';
 import { BaseBtn, BaseInput, BtnType, PhotoSelect } from '@/shared/ui';
 
-const emit = defineEmits<{
-  registered: [user: User];
+defineEmits<{
+  openAuth: [];
 }>();
 
 const { defineField, handleSubmit, meta, isSubmitting, errors } = useForm({
@@ -110,11 +111,13 @@ const [group] = defineField('group');
 const [email] = defineField('email');
 const [password] = defineField('password');
 
+const authStore = useAuthStore();
+
 const photo = ref<File | null>(null);
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    emit('registered', await userApi.register({ ...values, photo: photo.value }));
+    await authStore.register({ ...values, photo: photo.value });
   } catch (error) {
     toast.error(getErrorMessage(error, 'Не удалось зарегистрироваться'));
   }

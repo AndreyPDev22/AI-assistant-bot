@@ -12,6 +12,11 @@ export type RegisterPayload = {
   photo: File | null;
 };
 
+export type LoginPayload = {
+  email: string;
+  password: string;
+};
+
 export const userApi = {
   register: (payload: RegisterPayload) => {
     const body = new FormData();
@@ -27,6 +32,18 @@ export const userApi = {
       body.append('photo', payload.photo);
     }
 
-    return apiRequest<User>('/api/users/register', { method: 'POST', body });
+    return apiRequest<User>('/api/users/register', {
+      method: 'POST',
+      body,
+      credentials: 'include',
+    });
   },
+
+  login: (payload: LoginPayload) =>
+    apiRequest<User>('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      credentials: 'include',
+    }),
 };

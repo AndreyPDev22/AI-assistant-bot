@@ -47,6 +47,7 @@
           class="message-input__input"
           rows="1"
           placeholder="Введите запрос..."
+          @keydown.enter.exact.prevent="sendMessage"
         />
       </template>
       <div class="message-input__voice">

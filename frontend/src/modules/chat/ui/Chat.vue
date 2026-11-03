@@ -9,6 +9,7 @@
           v-if="chatId"
           :key="chatId"
           :chat-id
+          :is-awaiting-assistant
         />
         <template #fallback>
           <p>Загрузка сообщений...</p>
@@ -34,11 +35,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, watch, useTemplateRef, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 
-import { MessageInput, type Message, type MessagePayload } from '@/modules/message';
+import { MessageInput, SenderRole, type Message, type MessagePayload } from '@/modules/message';
 
 import { getErrorMessage } from '@/shared/api/client';
 
@@ -57,10 +58,56 @@ const messageInput = useTemplateRef('messageInput');
 
 const isMessagesLoaded = ref(false);
 const isSendingMessage = ref(false);
+const isAwaitingAssistant = ref(false);
 
 const isEmptyMessagesList = computed(() => {
   return !chatId || (isMessagesLoaded.value && !chatStore.messages.length);
 });
+
+const POLLING_INTERVAL_MS = 1000;
+const POLLING_TIMEOUT_MS = 15_000;
+
+let pollingTimerId = 0;
+let pollingDeadline = 0;
+let pollingChatId: string | null = null;
+
+function stopPolling() {
+  if (pollingTimerId) {
+    clearTimeout(pollingTimerId);
+    pollingTimerId = 0;
+  }
+  pollingDeadline = 0;
+  pollingChatId = null;
+  isAwaitingAssistant.value = false;
+}
+
+function startPolling(targetChatId: string, knownAssistantIds: Set<string>) {
+  stopPolling();
+  pollingChatId = targetChatId;
+  pollingDeadline = Date.now() + POLLING_TIMEOUT_MS;
+  isAwaitingAssistant.value = true;
+
+  const tick = async () => {
+    try {
+      await chatStore.fetchMessages(targetChatId);
+    } catch {
+      // Не обрабатываем
+    }
+
+    const hasNewAssistant = chatStore.messages.some((message) => {
+      return message.senderRole === SenderRole.ASSISTANT && !knownAssistantIds.has(message.id);
+    });
+
+    if (hasNewAssistant || Date.now() >= pollingDeadline) {
+      stopPolling();
+      return;
+    }
+
+    pollingTimerId = setTimeout(tick, POLLING_INTERVAL_MS);
+  };
+
+  pollingTimerId = setTimeout(tick, POLLING_INTERVAL_MS);
+}
 
 async function sendMessage(payload: MessagePayload) {
   const sentChatId = chatId;
@@ -76,14 +123,37 @@ async function sendMessage(payload: MessagePayload) {
     isSendingMessage.value = false;
   }
 
-  if (response && sentChatId === chatId) {
-    messageInput.value?.clear();
-
-    if (!sentChatId) {
-      router.push({ name: RouteNames.CHAT, params: { chatId: response.chatId } });
-    }
+  if (!response || sentChatId !== chatId) {
+    return;
   }
+
+  messageInput.value?.clear();
+
+  if (!sentChatId) {
+    router.push({ name: RouteNames.CHAT, params: { chatId: response.chatId } });
+  }
+
+  const knownAssistantIds = new Set(
+    chatStore.messages
+      .filter((message) => message.senderRole === SenderRole.ASSISTANT)
+      .map((message) => message.id),
+  );
+
+  startPolling(response.chatId, knownAssistantIds);
 }
+
+watch(
+  () => chatId,
+  (newChatId) => {
+    if (pollingChatId && pollingChatId !== newChatId) {
+      stopPolling();
+    }
+  },
+);
+
+onBeforeUnmount(() => {
+  stopPolling();
+});
 </script>
 
 <style lang="scss" scoped>
