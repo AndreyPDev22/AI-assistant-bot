@@ -83,7 +83,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { toast } from 'vue3-toastify';
 
-import { registerSchema, useAuthStore } from '@/modules/user';
+import { registerSchema, useUserStore } from '@/modules/user';
 
 import { getErrorMessage } from '@/shared/api/client';
 import { BaseBtn, BaseInput, BtnType, PhotoSelect } from '@/shared/ui';
@@ -111,13 +111,13 @@ const [group] = defineField('group');
 const [email] = defineField('email');
 const [password] = defineField('password');
 
-const authStore = useAuthStore();
+const userStore = useUserStore();
 
 const photo = ref<File | null>(null);
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await authStore.register({ ...values, photo: photo.value });
+    await userStore.register({ ...values, photo: photo.value });
   } catch (error) {
     toast.error(getErrorMessage(error, 'Не удалось зарегистрироваться'));
   }
@@ -125,6 +125,8 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/breakpoints' as *;
+
 .registration-form {
   display: flex;
   flex-direction: column;
@@ -140,6 +142,10 @@ const onSubmit = handleSubmit(async (values) => {
     line-height: 1.2;
     font-weight: 300;
     text-align: center;
+
+    @include tablet {
+      font-size: var(--font-size-lg);
+    }
   }
 
   &__photo {

@@ -14,8 +14,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-import AuthForm from './AuthForm.vue';
-import RegistrationForm from './RegistrationForm.vue';
+import { AuthForm, RegistrationForm } from '@/modules/user';
 
 enum FormType {
   AUTH = 'auth',

@@ -37,11 +37,11 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { useAuthStore } from '@/modules/user';
+import { useUserStore } from '@/modules/user';
+
+import DEFAULT_USER_PHOTO from '@/shared/assets/user.svg';
 
 import { AppView } from './types';
-
-import DEFAULT_USER_PHOTO from './assets/user.svg';
 
 const view = defineModel<AppView>({ default: AppView.CHAT });
 
@@ -53,7 +53,7 @@ defineEmits<{
   menuClick: [];
 }>();
 
-const { user } = storeToRefs(useAuthStore());
+const { user } = storeToRefs(useUserStore());
 
 const userPhoto = computed(() => user.value?.photoUrl ?? DEFAULT_USER_PHOTO);
 const burgerMenuAriaLabel = computed(() => (isMenuOpen ? 'Скрыть меню' : 'Открыть меню'));

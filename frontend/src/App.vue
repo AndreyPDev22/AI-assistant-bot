@@ -51,10 +51,13 @@
             to=".sidebar__profile-container"
             :disabled="!isTablet"
           >
-            <AuthPage
-              v-if="!isAuthenticated"
-              v-click-outside="() => (isOpenProfile = false)"
-            />
+            <div v-click-outside="() => (isOpenProfile = false)">
+              <AuthPage v-if="!isAuthenticated" />
+              <UserProfile
+                v-else
+                @close="isOpenProfile = false"
+              />
+            </div>
           </Teleport>
         </div>
       </main>
@@ -71,7 +74,7 @@ import { promiseTimeout, useMediaQuery } from '@vueuse/core';
 import { AppHeader, AppLoader, AppSidebar, AppView, AuthPage } from '@/widgets';
 
 import { ChatsList, AddChatBtn } from '@/modules/chat';
-import { useAuthStore } from '@/modules/user';
+import { UserProfile, useUserStore } from '@/modules/user';
 
 const TABLET_MIN_WIDTH = 744;
 const DESKTOP_MIN_WIDTH = 1440;
@@ -82,7 +85,7 @@ const vClickOutside = clickOutside.directive;
 const isTablet = useMediaQuery(`(min-width: ${TABLET_MIN_WIDTH}px)`);
 const isDesktop = useMediaQuery(`(min-width: ${DESKTOP_MIN_WIDTH}px)`);
 
-const { isAuthenticated } = storeToRefs(useAuthStore());
+const { isAuthenticated } = storeToRefs(useUserStore());
 
 const isFontsLoaded = ref(false);
 

@@ -10,7 +10,7 @@
       <img
         v-else
         class="photo-select__placeholder"
-        src="./assets/user.svg"
+        src="@/shared/assets/user.svg"
         alt=""
       />
     </span>
