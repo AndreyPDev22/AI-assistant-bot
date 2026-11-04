@@ -40,25 +40,24 @@
       <img
         :class="[
           'sidebar__user-avatar',
-          { 'sidebar__user-avatar--default': userPhoto === DEFAULT_USER_IMAGE },
+          { 'sidebar__user-avatar--default': profilePhoto === DEFAULT_USER_IMAGE },
         ]"
-        :src="userPhoto"
+        :src="profilePhoto"
         alt=""
       />
-      <span class="sidebar__user-name">{{ userName }}</span>
+      <span class="sidebar__user-name">{{ fullName }}</span>
     </button>
     <div class="sidebar__profile-container"></div>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { AddChatBtn, ChatsList } from '@/modules/chat';
-import { useAuthStore } from '@/modules/user';
+import { useUserStore } from '@/modules/user';
 
-import DEFAULT_USER_IMAGE from './assets/account.svg';
+import DEFAULT_USER_IMAGE from '@/shared/assets/user.svg';
 
 defineProps<{
   isOpen: boolean;
@@ -71,22 +70,7 @@ defineEmits<{
   toggleProfile: [];
 }>();
 
-const { user } = storeToRefs(useAuthStore());
-
-const userPhoto = computed(() => user.value?.photoUrl ?? DEFAULT_USER_IMAGE);
-const userName = computed(() => {
-  const nameParts = [];
-
-  if (user.value?.lastName) {
-    nameParts.push(user.value.lastName);
-  }
-  if (user.value?.firstName) {
-    nameParts.push(user.value.firstName);
-  }
-
-  const fullName = nameParts.join(' ');
-  return fullName || 'Гость';
-});
+const { profilePhoto, fullName } = storeToRefs(useUserStore());
 </script>
 
 <style lang="scss" scoped>

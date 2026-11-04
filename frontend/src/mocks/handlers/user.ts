@@ -2,8 +2,11 @@ import { delay, http, HttpResponse } from 'msw';
 import snakecaseKeys from 'snakecase-keys';
 
 import type { User } from '@/modules/user';
+import { AppLanguage, AppNotifications, AppTheme } from '@/modules/user';
 
 import { APIResponseStatus, type Envelope } from '@/shared/api/client';
+
+import USER_PHOTO from './assets/user.avif';
 
 const GROUP_PATTERN = /^\d{3}-\d{3}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,8 +23,12 @@ const MOCK_ACCOUNTS: MockAccount[] = [
       middleName: '',
       group: '261-321',
       email: 'demo@example.com',
-      photoUrl:
-        'https://img.magnific.com/free-photo/cropped-portrait-young-handsome-boy-looking-camera-posing-isolated-green-background_155003-45249.jpg',
+      photoUrl: USER_PHOTO,
+      settings: {
+        language: AppLanguage.RU,
+        notifications: AppNotifications.OFF,
+        theme: AppTheme.DARK,
+      },
     },
     password: 'password123',
   },
@@ -106,6 +113,11 @@ export const userApiHandlers = [
       group,
       email,
       photoUrl: photo instanceof File ? URL.createObjectURL(photo) : null,
+      settings: {
+        language: AppLanguage.RU,
+        notifications: AppNotifications.OFF,
+        theme: AppTheme.DARK,
+      },
     };
 
     MOCK_ACCOUNTS.push({ user, password });
@@ -128,5 +140,10 @@ export const userApiHandlers = [
     }
 
     return response(account.user);
+  }),
+
+  http.post('/api/auth/logout', async () => {
+    await delay(100);
+    return response(null, APIResponseStatus.SUCCESS);
   }),
 ];

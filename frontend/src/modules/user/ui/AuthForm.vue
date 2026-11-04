@@ -58,7 +58,7 @@ import { toast } from 'vue3-toastify';
 import { toTypedSchema } from '@vee-validate/zod';
 
 import { BaseBtn, BaseInput, BtnType, BtnVariant, InputSize } from '@/shared/ui';
-import { loginSchema, useAuthStore } from '@/modules/user';
+import { loginSchema, useUserStore } from '@/modules/user';
 import { getErrorMessage } from '@/shared/api/client';
 
 defineEmits<{
@@ -75,11 +75,11 @@ const { defineField, handleSubmit, meta, isSubmitting, errors } = useForm({
 const [email] = defineField('email');
 const [password] = defineField('password');
 
-const authStore = useAuthStore();
+const userStore = useUserStore();
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await authStore.login(values);
+    await userStore.login(values);
   } catch (error) {
     toast.error(getErrorMessage(error, 'Не удалось зарегистрироваться'));
     return;
@@ -88,12 +88,18 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/breakpoints' as *;
+
 .auth-form {
   &__title {
     font-family: 'Montserrat';
     font-size: var(--font-size-xl);
     text-align: center;
     font-weight: 300;
+
+    @include tablet {
+      font-size: var(--font-size-lg);
+    }
   }
 
   &__divider {

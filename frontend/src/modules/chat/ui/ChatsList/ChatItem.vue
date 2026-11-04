@@ -43,7 +43,12 @@
         <button
           class="chat__action"
           type="button"
-          @click="action.action"
+          @click="
+            {
+              action.action();
+              $emit('close');
+            }
+          "
         >
           <img
             :src="action.icon"

@@ -18,8 +18,6 @@ export type LoginPayload = {
 };
 
 export const userApi = {
-  me: () => apiRequest<User>('/api/users/me'),
-  logout: () => apiRequest<null>('/api/auth/logout', { method: 'POST' }),
   register: (payload: RegisterPayload) => {
     const body = new FormData();
 
@@ -46,6 +44,12 @@ export const userApi = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      credentials: 'include',
+    }),
+
+  logout: () =>
+    apiRequest<null>('/api/auth/logout', {
+      method: 'POST',
       credentials: 'include',
     }),
 };

@@ -46,7 +46,7 @@ export async function apiRequest<T>(input: RequestInfo | URL, init?: RequestInit
   if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
     headers.set('X-CSRF-Protection', '1');
   }
-  const response = await fetch(input, { credentials: 'include', ...init, headers });
+  const response = await fetch(input, { ...init, headers });
   const body = await response.json().catch(() => null);
   const { data, error, detail } = camelcaseKeys((body ?? {}) as Envelope<T>, { deep: true });
 

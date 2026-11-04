@@ -1,8 +1,6 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
-import { useAuthStore } from '@/modules/user';
-
 import { router } from './router';
 import { setupMocks } from './mocks';
 import App from './App.vue';
@@ -14,16 +12,7 @@ async function mountApp() {
     await setupMocks();
   }
 
-  const pinia = createPinia();
-  const app = createApp(App).use(pinia).use(router);
-  if (import.meta.env.VITE_USE_API_MOCK !== 'true') {
-    try {
-      await useAuthStore(pinia).restoreSession();
-    } catch (error) {
-      console.error('Не удалось восстановить сессию', error);
-    }
-  }
-  app.mount('#app');
+  createApp(App).use(createPinia()).use(router).mount('#app');
 }
 
 mountApp();

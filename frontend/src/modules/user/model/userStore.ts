@@ -1,31 +1,29 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-
-import { ApiError } from '@/shared/api/client';
 
 import type { User } from './user';
 import { userApi, type LoginPayload, type RegisterPayload } from '../api/user';
 
-export const useAuthStore = defineStore('auth', () => {
+import DEFAULT_USER_IMAGE from '@/shared/assets/user.svg';
+
+export const useUserStore = defineStore('auth', () => {
   const user = ref<User | null>(null);
   const isAuthenticated = ref(false);
 
-  async function restoreSession() {
-    try {
-      user.value = await userApi.me();
-      isAuthenticated.value = true;
-    } catch (error) {
-      if (!(error instanceof ApiError) || error.status !== 401) throw error;
-      user.value = null;
-      isAuthenticated.value = false;
-    }
-  }
+  const profilePhoto = computed(() => user.value?.photoUrl ?? DEFAULT_USER_IMAGE);
+  const fullName = computed(() => {
+    const nameParts = [];
 
-  async function logout() {
-    await userApi.logout();
-    user.value = null;
-    isAuthenticated.value = false;
-  }
+    if (user.value?.lastName) {
+      nameParts.push(user.value.lastName);
+    }
+    if (user.value?.firstName) {
+      nameParts.push(user.value.firstName);
+    }
+
+    const fullName = nameParts.join(' ');
+    return fullName || 'Гость';
+  });
 
   async function login(payload: LoginPayload) {
     const response = await userApi.login(payload);
@@ -43,12 +41,20 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function logout() {
+    await userApi.logout();
+
+    user.value = null;
+    isAuthenticated.value = false;
+  }
+
   return {
     user,
+    fullName,
+    profilePhoto,
     isAuthenticated,
     login,
     register,
-    restoreSession,
     logout,
   };
 });
