@@ -18,6 +18,8 @@ export type LoginPayload = {
 };
 
 export const userApi = {
+  me: () => apiRequest<User>('/api/users/me'),
+  logout: () => apiRequest<null>('/api/auth/logout', { method: 'POST' }),
   register: (payload: RegisterPayload) => {
     const body = new FormData();
 
