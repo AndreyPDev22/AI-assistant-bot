@@ -41,7 +41,12 @@ export class ApiError extends Error {
 }
 
 export async function apiRequest<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
-  const response = await fetch(input, init);
+  const headers = new Headers(init?.headers);
+  const method = (init?.method ?? 'GET').toUpperCase();
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    headers.set('X-CSRF-Protection', '1');
+  }
+  const response = await fetch(input, { credentials: 'include', ...init, headers });
   const body = await response.json().catch(() => null);
   const { data, error, detail } = camelcaseKeys((body ?? {}) as Envelope<T>, { deep: true });
 
