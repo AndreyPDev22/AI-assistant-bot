@@ -5,7 +5,7 @@
     aria-label="Загрузка"
   >
     <img
-      class="app-loader__icon"
+      class="app-loader__logo"
       src="@/shared/assets/star.svg"
       alt=""
     />
@@ -24,7 +24,7 @@
 
   background-color: var(--color-pink-50);
 
-  &__icon {
+  &__logo {
     width: 120px;
     height: 120px;
   }

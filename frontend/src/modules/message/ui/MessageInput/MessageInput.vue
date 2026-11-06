@@ -46,7 +46,7 @@
           v-model="text"
           class="message-input__input"
           rows="1"
-          placeholder="Введите запрос..."
+          :placeholder="$t('chats.enterRequest')"
           @keydown.enter.exact.prevent="sendMessage"
         />
       </template>
@@ -67,7 +67,12 @@
           class="message-input__microphone"
           aria-label="Ввести голосовое сообщение"
           @click="toggleRecording"
-        ></button>
+        >
+          <img
+            :src="isRecording ? MICROPHONE_ICON_PLAY : MICROPHONE_ICON"
+            alt=""
+          />
+        </button>
       </div>
       <button
         class="message-input__send-message"
@@ -91,6 +96,9 @@ import type { MessageFile, MessagePayload } from '../../model/message';
 import { useVoiceRecorder } from '../../lib/useVoiceRecorder';
 
 import FilePreview from '../FilePreview/FilePreview.vue';
+
+import MICROPHONE_ICON from './assets/microphone.svg';
+import MICROPHONE_ICON_PLAY from './assets/microphone-play.svg';
 
 const { isDisabled } = defineProps<{
   isDisabled?: boolean;
@@ -174,14 +182,26 @@ defineExpose({ clear });
 <style lang="scss" scoped>
 @use '@/styles/breakpoints' as *;
 
+:root[data-theme='dark'] {
+  .message-input {
+    --message-input-disabled-background: #6a5154;
+    --voice-background: #af8181;
+    --microphone-background: #9d6f73;
+  }
+}
+
 .message-input {
+  --message-input-disabled-background: #f6e7e8;
+  --voice-background: #f4e2e4;
+  --microphone-background: #ebcfd2;
+
   width: 100%;
   padding: 10px 11px 9px 19px;
 
   flex-direction: column;
 
   border-radius: 24px;
-  background-color: #eecfd2;
+  background-color: var(--color-pink-100);
   box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.25);
 
   &,
@@ -285,33 +305,14 @@ defineExpose({ clear });
     gap: 5px;
   }
 
-  &--recording {
-    padding-left: 10px;
-
-    .message-input__voice {
-      height: 33px;
-
-      margin-left: 0;
-      padding: 6px 1px 6px 13px;
-
-      border-radius: 80px;
-      background-color: #f4e2e4;
-    }
-
-    .message-input__microphone {
-      background-color: #e0b9bd;
-      background-image: url('./assets/microphone-play.svg');
-    }
-
-    .message-input__send-message {
-      margin-left: 10px;
-    }
-  }
-
   &__microphone {
-    background-image: url('./assets/microphone.svg');
-    background-repeat: no-repeat;
-    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      width: 12px;
+      height: 18px;
+    }
   }
 
   &__voice-volumes {
@@ -361,6 +362,33 @@ defineExpose({ clear });
     background-color: var(--color-pink-300);
   }
 
+  &--recording {
+    padding-left: 10px;
+
+    .message-input__voice {
+      height: 33px;
+
+      margin-left: 0;
+      padding: 6px 1px 6px 13px;
+
+      border-radius: 80px;
+      background-color: var(--voice-background);
+    }
+
+    .message-input__microphone {
+      background-color: var(--microphone-background);
+
+      img {
+        width: 13px;
+        height: 13px;
+      }
+    }
+
+    .message-input__send-message {
+      margin-left: 10px;
+    }
+  }
+
   &--has-text {
     .message-input__field {
       row-gap: 8px;
@@ -369,10 +397,10 @@ defineExpose({ clear });
 
   &--disabled {
     pointer-events: none;
-    background-color: #f6e7e8;
+    background-color: vaf(--message-input-disabled-background);
 
     .message-input__send-message {
-      background-color: #ebcfd2;
+      background-color: var(--microphone-background);
     }
 
     .message-input__upload-file img,
@@ -410,11 +438,10 @@ defineExpose({ clear });
       padding: 15px 10px 10px 15px;
 
       border-radius: 12px;
-      background-color: var(--color-pink-100);
       box-shadow: 2px 3px 7px var(--color-shadow);
 
       &.message-input--disabled {
-        background-color: #f6e7e8;
+        background-color: var(--message-input-disabled-background);
       }
 
       .message-input__field {
@@ -449,7 +476,10 @@ defineExpose({ clear });
       }
 
       .message-input__microphone {
-        background-size: 18px 27px;
+        img {
+          width: 18px;
+          height: 27px;
+        }
       }
 
       .message-input__send-message {
@@ -479,7 +509,10 @@ defineExpose({ clear });
       }
 
       .message-input__microphone {
-        background-size: 16px 23px;
+        img {
+          width: 16px;
+          height: 23px;
+        }
       }
 
       .message-input__send-message {

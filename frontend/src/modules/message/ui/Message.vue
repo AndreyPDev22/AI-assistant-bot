@@ -41,6 +41,12 @@ const html = computed(() =>
 @use '@/styles/breakpoints' as *;
 
 .message {
+  --link-color: var(--color-pink-700);
+  --quote-border: var(--color-pink-400);
+  --quote-text: var(--color-pink-900);
+  --info-background: var(--color-pink-50);
+  --border: var(--color-pink-200);
+
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -119,7 +125,7 @@ const html = computed(() =>
     }
 
     :deep(a) {
-      color: #2563eb;
+      color: var(--link-color);
       text-decoration: underline;
       text-underline-offset: 2px;
     }
@@ -152,14 +158,14 @@ const html = computed(() =>
 
     :deep(blockquote) {
       padding: 0.25em 1em;
-      border-left: 4px solid #d1d5db;
-      color: #4b5563;
+      border-left: 4px solid var(--quote-border);
+      color: var(--quote-color);
     }
 
     :deep(code) {
       padding: 0.15em 0.4em;
       border-radius: 4px;
-      background-color: #f3f4f6;
+      background-color: var(--info-background);
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 0.9em;
     }
@@ -167,7 +173,7 @@ const html = computed(() =>
     :deep(pre) {
       padding: 12px 16px;
       border-radius: 6px;
-      background-color: #f3f4f6;
+      background-color: var(--info-background);
       overflow-x: auto;
     }
 
@@ -179,7 +185,7 @@ const html = computed(() =>
 
     :deep(hr) {
       border: 0;
-      border-top: 1px solid #d1d5db;
+      border-top: 1px solid var(--border-color);
     }
 
     :deep(table) {
@@ -192,12 +198,12 @@ const html = computed(() =>
     :deep(th),
     :deep(td) {
       padding: 6px 12px;
-      border: 1px solid #d1d5db;
+      border: 1px solid var(--border);
       text-align: left;
     }
 
     :deep(th) {
-      background-color: #f3f4f6;
+      background-color: var(--info-background);
       font-weight: 600;
     }
 

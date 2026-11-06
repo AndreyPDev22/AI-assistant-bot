@@ -71,7 +71,14 @@ const checked = computed({
 </script>
 
 <style lang="scss" scoped>
+:root[data-theme='dark'] {
+  .base-switch {
+    --box-shadow: #754848;
+  }
+}
 .base-switch {
+  --box-shadow: #c09296;
+
   position: relative;
   display: block;
   width: 55px;
@@ -99,7 +106,7 @@ const checked = computed({
 
     border-radius: 200px;
     background-color: var(--color-pink-150);
-    box-shadow: inset 0 2px 4px #c09296;
+    box-shadow: inset 0 2px 4px var(--box-shadow);
   }
 
   &__thumb {
@@ -149,6 +156,11 @@ const checked = computed({
   &__input:focus-visible ~ .base-switch__track {
     outline: 2px solid var(--color-pink-600);
     outline-offset: 2px;
+  }
+
+  img.base-switch__icon {
+    filter: brightness(0) saturate(100%) invert(39%) sepia(12%) saturate(600%) hue-rotate(314deg)
+      brightness(88%) contrast(85%);
   }
 }
 </style>

@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { toast } from 'vue3-toastify';
 
 import { getErrorMessage } from '@/shared/api/client';
@@ -56,16 +57,6 @@ const CHAT_GROUP_ORDER: ChatGroupType[] = [
   ChatGroupType.OTHER,
 ];
 
-const CHAT_GROUP_TYPE_TITLES: Record<ChatGroupType, string> = {
-  [ChatGroupType.FAVORITE]: '♡ Избранное',
-  [ChatGroupType.TODAY]: 'Сегодня',
-  [ChatGroupType.YESTERDAY]: 'Вчера',
-  [ChatGroupType.LAST_WEEK]: 'За последнюю неделю',
-  [ChatGroupType.LAST_MONTH]: 'За последний месяц',
-  [ChatGroupType.LAST_YEAR]: 'За последний год',
-  [ChatGroupType.OTHER]: 'Ранее',
-};
-
 const CHAT_GROUP_MAX_AGE_IN_DAYS: [ChatGroupType, number][] = [
   [ChatGroupType.TODAY, 1],
   [ChatGroupType.YESTERDAY, 2],
@@ -74,11 +65,23 @@ const CHAT_GROUP_MAX_AGE_IN_DAYS: [ChatGroupType, number][] = [
   [ChatGroupType.LAST_YEAR, 365],
 ];
 
-const openedChatId = ref<string | null>(null);
-
 defineEmits<{
   closeList: [];
 }>();
+
+const { t } = useI18n();
+
+const openedChatId = ref<string | null>(null);
+
+const CHAT_GROUP_TYPE_TITLES = computed<Record<ChatGroupType, string>>(() => ({
+  [ChatGroupType.FAVORITE]: t('chats.chatGroups.favorite'),
+  [ChatGroupType.TODAY]: t('chats.chatGroups.today'),
+  [ChatGroupType.YESTERDAY]: t('chats.chatGroups.yesterday'),
+  [ChatGroupType.LAST_WEEK]: t('chats.chatGroups.lastWeek'),
+  [ChatGroupType.LAST_MONTH]: t('chats.chatGroups.lastMonth'),
+  [ChatGroupType.LAST_YEAR]: t('chats.chatGroups.lastYear'),
+  [ChatGroupType.OTHER]: t('chats.chatGroups.other'),
+}));
 
 function getChatGroupType(chat: Chat, now: number): ChatGroupType {
   if (chat.isFavorite) {

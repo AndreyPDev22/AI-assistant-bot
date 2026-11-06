@@ -1,6 +1,8 @@
 import { apiRequest } from '@/shared/api/client';
 
-import type { User } from '../model/user';
+import type { User, UserSettings } from '../model/user';
+
+export type UpdateSettingsPayload = Partial<UserSettings>;
 
 export type RegisterPayload = {
   lastName: string;
@@ -18,6 +20,12 @@ export type LoginPayload = {
 };
 
 export const userApi = {
+  me: () =>
+    apiRequest<User>('/api/auth/me', {
+      method: 'GET',
+      credentials: 'include',
+    }),
+
   register: (payload: RegisterPayload) => {
     const body = new FormData();
 
@@ -52,4 +60,23 @@ export const userApi = {
       method: 'POST',
       credentials: 'include',
     }),
+
+  updateSettings: (payload: UpdateSettingsPayload) =>
+    apiRequest<UserSettings>('/api/users/me/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      credentials: 'include',
+    }),
+
+  updatePhoto: (photo: File) => {
+    const body = new FormData();
+    body.append('photo', photo);
+
+    return apiRequest<User>('/api/users/me/photo', {
+      method: 'PATCH',
+      body,
+      credentials: 'include',
+    });
+  },
 };
