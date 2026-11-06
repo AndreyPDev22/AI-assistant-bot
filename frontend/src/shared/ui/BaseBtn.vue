@@ -29,10 +29,18 @@ const {
 <style lang="scss" scoped>
 @use '@/styles/breakpoints' as *;
 
-$primary: var(--base-btn-primary, var(--color-pink-150));
-$disabled: #eee4e5;
+:root[data-theme='dark'] {
+  .base-btn {
+    --disabled-background: #6a5154;
+    --disabled-color: white;
+  }
+}
 
 .base-btn {
+  $primary: var(--base-btn-primary, var(--color-pink-150));
+  --disabled-background: #eee4e5;
+  --disabled-color: #4d4d4d;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,9 +49,10 @@ $disabled: #eee4e5;
 
   text-decoration: none;
 
-  border: 1px solid transparent;
+  border: 1px solid $primary;
   border-radius: 46px;
 
+  background-color: $primary;
   cursor: pointer;
 
   &--sm {
@@ -63,20 +72,14 @@ $disabled: #eee4e5;
     height: 50px;
   }
 
-  &--primary {
-    border-color: $primary;
-    background-color: $primary;
-  }
-
   &--outline {
-    border-color: #ba9b9d;
     background-color: transparent;
   }
 
   &:disabled {
-    color: #4d4d4d;
-    border-color: $disabled;
-    background-color: $disabled;
+    color: var(--disabled-color);
+    border-color: var(--disabled-background);
+    background-color: var(--disabled-background);
     cursor: default;
   }
 }

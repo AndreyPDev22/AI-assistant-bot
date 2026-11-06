@@ -1,14 +1,14 @@
 <template>
   <div class="auth-form">
-    <h2 class="auth-form__title">Войти или зарегистрироваться</h2>
+    <h2 class="auth-form__title">{{ $t('auth.authForm.title') }}</h2>
     <BaseBtn
       class="auth-form__euz"
       :as="'a'"
       :variant="BtnVariant.OUTLINE"
     >
-      Продолжить с помощью ЕУЗ
+      {{ $t('auth.authForm.euz') }}
     </BaseBtn>
-    <p class="auth-form__divider">или</p>
+    <p class="auth-form__divider">{{ $t('auth.authForm.or') }}</p>
     <form
       class="auth-form__fields"
       @submit="onSubmit"
@@ -18,7 +18,7 @@
         v-model="email"
         name="email"
         type="email"
-        placeholder="Введите почту"
+        :placeholder="$t('auth.authForm.fields.email.placeholder')"
         :error-text="errors.email"
         :size="InputSize.LG"
       />
@@ -27,7 +27,7 @@
         v-model="password"
         name="password"
         type="password"
-        placeholder="Введите пароль"
+        :placeholder="$t('auth.authForm.fields.password.placeholder')"
         :error-text="errors.password"
         :size="InputSize.LG"
       />
@@ -37,14 +37,14 @@
           :type="BtnType.SUBMIT"
           :disabled="!meta.valid || isSubmitting"
         >
-          Войти
+          {{ $t('auth.login') }}
         </BaseBtn>
         <BaseBtn
           class="auth-form__register"
           :variant="BtnVariant.OUTLINE"
           @click="$emit('openRegistration')"
         >
-          Зарегистрироваться
+          {{ $t('auth.register') }}
         </BaseBtn>
       </div>
     </form>
@@ -58,8 +58,10 @@ import { toast } from 'vue3-toastify';
 import { toTypedSchema } from '@vee-validate/zod';
 
 import { BaseBtn, BaseInput, BtnType, BtnVariant, InputSize } from '@/shared/ui';
-import { loginSchema, useUserStore } from '@/modules/user';
 import { getErrorMessage } from '@/shared/api/client';
+
+import { loginSchema } from './../model/loginSchema';
+import { useUserStore } from './../model/userStore';
 
 defineEmits<{
   openRegistration: [];

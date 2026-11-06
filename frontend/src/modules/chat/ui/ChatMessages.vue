@@ -16,11 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import { toast } from 'vue3-toastify';
+import { useRouter } from 'vue-router';
 
 import { MessageItem } from '@/modules/message';
-
-import { getErrorMessage } from '@/shared/api/client';
 
 import { useChatStore } from '../model/store';
 
@@ -29,12 +27,14 @@ const { chatId, isAwaitingAssistant = false } = defineProps<{
   isAwaitingAssistant?: boolean;
 }>();
 
+const router = useRouter();
+
 const chatStore = useChatStore();
 
 try {
   await chatStore.fetchMessages(chatId);
-} catch (error) {
-  toast.error(getErrorMessage(error, 'Не удалось загрузить сообщения'));
+} catch {
+  router.push({ path: '/' });
 }
 </script>
 

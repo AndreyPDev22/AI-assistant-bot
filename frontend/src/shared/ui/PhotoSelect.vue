@@ -33,18 +33,18 @@
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount } from 'vue';
 
+const { preview = undefined } = defineProps<{
+  preview?: string;
+}>();
+
 const photo = defineModel<File | null>({ default: null });
 
-const previewUrl = ref('');
+const previewUrl = ref(preview);
 
-watch(
-  photo,
-  (file) => {
-    revokePreview();
-    previewUrl.value = file ? URL.createObjectURL(file) : '';
-  },
-  { immediate: true },
-);
+watch(photo, (file) => {
+  revokePreview();
+  previewUrl.value = file ? URL.createObjectURL(file) : '';
+});
 
 onBeforeUnmount(revokePreview);
 
@@ -125,6 +125,10 @@ function onChange(event: Event) {
     outline: 2px solid var(--color-pink-600);
     outline-offset: 2px;
     border-radius: 50%;
+  }
+
+  img.photo-select__image {
+    filter: none;
   }
 }
 </style>

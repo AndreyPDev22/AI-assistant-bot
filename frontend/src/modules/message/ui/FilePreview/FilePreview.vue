@@ -82,7 +82,14 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+:root[data-theme='dark'] {
+  .file {
+    --file-background: #543437;
+  }
+}
+
 .file {
+  --file-background: #d3a0a5;
   position: relative;
 
   place-self: center;
@@ -98,7 +105,7 @@ onMounted(async () => {
 
     text-decoration: none;
 
-    border: 1px solid #d3a0a5;
+    border: 1px solid var(--file-background);
     border-radius: 6px;
 
     overflow: hidden;
@@ -140,7 +147,7 @@ onMounted(async () => {
     gap: 10px;
 
     font-size: 1rem;
-    background-color: #d3a0a5;
+    background-color: var(--file-background);
 
     img {
       width: 7px;
@@ -167,6 +174,10 @@ onMounted(async () => {
     &--placeholder {
       object-fit: none;
     }
+  }
+
+  img.file__preview {
+    filter: none;
   }
 }
 </style>

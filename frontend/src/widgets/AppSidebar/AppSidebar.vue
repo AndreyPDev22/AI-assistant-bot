@@ -35,16 +35,24 @@
     <button
       class="sidebar__user"
       aria-label="Открыть профиль"
-      @click="$emit('toggleProfile')"
+      @click="
+        {
+          $emit('open');
+          $emit('toggleProfile');
+        }
+      "
     >
-      <img
+      <div
         :class="[
           'sidebar__user-avatar',
           { 'sidebar__user-avatar--default': profilePhoto === DEFAULT_USER_IMAGE },
         ]"
-        :src="profilePhoto"
-        alt=""
-      />
+      >
+        <img
+          :src="profilePhoto"
+          alt=""
+        />
+      </div>
       <span class="sidebar__user-name">{{ fullName }}</span>
     </button>
     <div class="sidebar__profile-container"></div>
@@ -76,14 +84,22 @@ const { profilePhoto, fullName } = storeToRefs(useUserStore());
 <style lang="scss" scoped>
 @use '@/styles/breakpoints' as *;
 
+:root[data-theme='dark'] {
+  .sidebar {
+    --profile-container-box-shadow: black;
+  }
+}
+
 .sidebar {
+  --profile-container-box-shadow: #ba9b9d;
+
   position: relative;
-  display: none;
+  display: flex;
   flex-direction: column;
   flex-shrink: 0;
 
-  height: 100dvh;
   width: 296px;
+  height: 100dvh;
   padding: 20px;
 
   background-color: var(--color-pink-50);
@@ -165,8 +181,20 @@ const { profilePhoto, fullName } = storeToRefs(useUserStore());
     border-radius: 50%;
     background-color: var(--color-pink-300);
 
+    img {
+      width: 100%;
+      height: 100%;
+
+      border-radius: 50%;
+      filter: none;
+    }
+
     &--default {
       padding: 8px 12px;
+
+      img {
+        filter: brightness(0) invert(1);
+      }
     }
   }
 
@@ -186,8 +214,8 @@ const { profilePhoto, fullName } = storeToRefs(useUserStore());
       transform: translateY(-100%);
 
       border-radius: 11px;
-      background-color: white;
-      box-shadow: 2px 2px 6.7px 0px #ba9b9d;
+      background-color: var(--background-color);
+      box-shadow: 2px 2px 6.7px 0px var(--profile-container-box-shadow);
     }
   }
 
@@ -223,6 +251,7 @@ const { profilePhoto, fullName } = storeToRefs(useUserStore());
   }
 
   @include desktop {
+    display: flex;
     transform: none;
     visibility: visible;
     padding-bottom: 15px;

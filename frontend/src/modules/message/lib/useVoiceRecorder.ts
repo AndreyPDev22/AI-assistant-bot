@@ -1,4 +1,6 @@
 import { ref, onBeforeUnmount, type Ref } from 'vue';
+import { toast } from 'vue3-toastify';
+
 import type { MessageFile } from '../model/message';
 
 export type VolumeLevel = 1 | 2 | 3 | 4 | 5;
@@ -40,8 +42,8 @@ export function useVoiceRecorder(
 
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (error) {
-      console.error('Не удалось получить доступ к микрофону', error);
+    } catch {
+      toast.error('Не удалось получить доступ к микрофону');
       return;
     }
 

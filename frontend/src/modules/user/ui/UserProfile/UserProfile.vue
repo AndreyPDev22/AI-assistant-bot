@@ -2,12 +2,13 @@
   <section class="user-profile">
     <PhotoSelect
       v-model="photo"
+      :preview="profilePhoto"
       class="user-profile__photo"
     />
     <h3 class="user-profile__name">{{ fullName }}</h3>
     <dl class="user-profile__settings">
       <div class="user-profile__setting">
-        <dt>Язык</dt>
+        <dt>{{ $t('profile.language') }}</dt>
         <dd>
           <BaseSelect
             v-model="settings.language"
@@ -16,7 +17,7 @@
         </dd>
       </div>
       <div class="user-profile__setting">
-        <dt>Уведомления</dt>
+        <dt>{{ $t('profile.notifications') }}</dt>
         <dd>
           <BaseSwitch
             v-model="settings.notifications"
@@ -26,7 +27,7 @@
         </dd>
       </div>
       <div class="user-profile__setting">
-        <dt>Тема</dt>
+        <dt>{{ $t('profile.theme') }}</dt>
         <dd>
           <BaseSwitch
             v-model="settings.theme"
@@ -49,13 +50,15 @@
         }
       "
     >
-      Выйти из аккаунта
+      {{ $t('auth.logout') }}
     </BaseBtn>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { toast } from 'vue3-toastify';
 
 import {
   BaseBtn,
@@ -66,25 +69,22 @@ import {
   PhotoSelect,
   type SelectOption,
 } from '@/shared/ui';
+import { i18n } from '@/shared/i18n';
+import { AppTheme } from '@/shared/config/appTheme';
 
 import { useUserStore } from '../../model/userStore';
-import { AppLanguage, AppNotifications, AppTheme } from '../../model/user';
+import { AppLanguage, AppNotifications } from '../../model/user';
 import type { UserSettings } from '../../model/user';
 
 import DARK_THEME_ICON from './assets/dark-theme.svg';
 import LIGHT_THEME_ICON from './assets/light-theme.svg';
 
-const LANGUAGE_OPTIONS: SelectOption[] = [
-  { value: AppLanguage.RU, label: 'Русский' },
-  { value: AppLanguage.EN, label: 'Английский' },
-  { value: AppLanguage.CH, label: 'Китайский' },
-];
-
 defineEmits<{
   close: [];
 }>();
 
-const { user, profilePhoto, fullName, logout } = useUserStore();
+const { t } = useI18n();
+const { user, profilePhoto, fullName, logout, updateSettings, updatePhoto } = useUserStore();
 
 if (!user) {
   throw new Error('Пользователь не авторизован');
@@ -97,32 +97,81 @@ const settings = ref<UserSettings>({
   theme: user.settings.theme,
 });
 
-onMounted(async () => {
-  if (!profilePhoto) {
-    return;
-  }
+const LANGUAGE_OPTIONS = computed<SelectOption[]>(() => [
+  { value: AppLanguage.RU, label: t('profile.languages.ru') },
+  { value: AppLanguage.EN, label: t('profile.languages.en') },
+  { value: AppLanguage.ZH, label: t('profile.languages.zh') },
+]);
+
+watch(
+  () => settings.value.theme,
+  async (newTheme, oldTheme) => {
+    try {
+      await updateSettings(settings.value);
+    } catch {
+      toast.error('Не удалось обновить настройки');
+      return;
+    }
+    if (newTheme !== oldTheme) {
+      i18n.global.locale.value = settings.value.language;
+    }
+  },
+);
+
+watch(
+  () => settings.value.language,
+  async () => {
+    try {
+      await updateSettings(settings.value);
+    } catch {
+      toast.error('Не удалось обновить настройки');
+    }
+  },
+);
+
+watch(
+  () => settings.value.notifications,
+  async (newVal, oldVal) => {
+    try {
+      await updateSettings(settings.value);
+    } catch {
+      toast.error('Не удалось обновить настройки');
+      return;
+    }
+    if (newVal !== oldVal && newVal === AppNotifications.ON) {
+      await requestNotificationPermission();
+    }
+  },
+);
+
+watch(photo, async (file) => {
+  if (!file) return;
 
   try {
-    photo.value = await urlToFile(profilePhoto, 'profile-photo');
-  } catch (e) {
-    console.error('Ошибка преобразования ссылки в файл:', e);
+    await updatePhoto(file);
+  } catch {
+    toast.error('Не удалось обновить фотографию');
   }
 });
 
-async function urlToFile(url: string, fileName = 'photo'): Promise<File> {
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`Не удалось загрузить файл: ${response.status}`);
+const requestNotificationPermission = async () => {
+  if (!('Notification' in window)) {
+    toast.error('Ваш браузер не поддерживает уведомления');
+    return false;
   }
 
-  const blob = await response.blob();
+  if (Notification.permission === 'granted') {
+    return true;
+  }
 
-  const mime = blob.type || 'image/jpeg';
-  const ext = mime.split('/')[1]?.split('+')[0] || 'jpg';
+  if (Notification.permission === 'denied') {
+    toast.error('Разрешите уведомления в настройках браузера');
+    return false;
+  }
 
-  return new File([blob], `${fileName}.${ext}`, { type: mime });
-}
+  const permission = await Notification.requestPermission();
+  return permission === 'granted';
+};
 </script>
 
 <style lang="scss" scoped>

@@ -3,7 +3,7 @@
     class="registration-form"
     @submit="onSubmit"
   >
-    <h2 class="registration-form__title">Регистрация</h2>
+    <h2 class="registration-form__title">{{ $t('auth.registrationForm.title') }}</h2>
 
     <PhotoSelect
       v-model="photo"
@@ -15,33 +15,33 @@
         id="registration-last-name"
         v-model="lastName"
         name="last_name"
-        placeholder="Фамилия"
         required
+        :placeholder="$t('auth.registrationForm.fields.lastName.placeholder')"
         :error-text="errors.lastName"
       />
       <BaseInput
         id="registration-first-name"
         v-model="firstName"
         name="first_name"
-        placeholder="Имя"
         required
+        :placeholder="$t('auth.registrationForm.fields.firstName.placeholder')"
         :error-text="errors.firstName"
       />
       <BaseInput
         id="registration-middle-name"
         v-model="middleName"
         name="middle_name"
-        placeholder="Отчество"
         optional
+        :placeholder="$t('auth.registrationForm.fields.middleName.placeholder')"
         :error-text="errors.middleName"
       />
       <BaseInput
         id="registration-group"
         v-model="group"
         name="group"
-        placeholder="Номер группы"
-        description="(формат 261-321)"
         required
+        :placeholder="$t('auth.registrationForm.fields.group.placeholder')"
+        :description="$t('auth.registrationForm.fields.group.description')"
         :error-text="errors.group"
       />
       <hr class="registration-form__divider" />
@@ -50,8 +50,8 @@
         v-model="email"
         name="email"
         type="email"
-        placeholder="Адрес электронной почты"
         required
+        :placeholder="$t('auth.registrationForm.fields.email.placeholder')"
         :error-text="errors.email"
       />
       <BaseInput
@@ -59,34 +59,35 @@
         v-model="password"
         name="password"
         type="password"
-        placeholder="Придумайте пароль"
         required
+        :placeholder="$t('auth.registrationForm.fields.password.placeholder')"
         :error-text="errors.password"
       />
     </div>
 
-    <p class="registration-form__note">* - необязательное поле</p>
+    <p class="registration-form__note">* - {{ $t('auth.notRequiredField') }}</p>
 
     <BaseBtn
       :type="BtnType.SUBMIT"
       :disabled="!meta.valid || isSubmitting"
     >
-      Зарегистрироваться
+      {{ $t('auth.register') }}
     </BaseBtn>
-    <BaseBtn @click="$emit('openAuth')"> Войти </BaseBtn>
+    <BaseBtn @click="$emit('openAuth')"> {{ $t('auth.login') }} </BaseBtn>
   </form>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
 import { toast } from 'vue3-toastify';
-
-import { registerSchema, useUserStore } from '@/modules/user';
+import { toTypedSchema } from '@vee-validate/zod';
 
 import { getErrorMessage } from '@/shared/api/client';
 import { BaseBtn, BaseInput, BtnType, PhotoSelect } from '@/shared/ui';
+
+import { registerSchema } from '../model/registerSchema';
+import { useUserStore } from '../model/userStore';
 
 defineEmits<{
   openAuth: [];

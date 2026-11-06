@@ -11,7 +11,7 @@
         src="./assets/icon.svg"
         alt=""
       />
-      <span>Новый чат</span>
+      <span>{{ $t('chats.createChat') }}</span>
     </div>
   </BaseBtn>
 </template>

@@ -1,17 +1,14 @@
+import type { AppTheme } from '@/shared/config/appTheme';
+
 export enum AppLanguage {
   RU = 'ru',
   EN = 'en',
-  CH = 'ch',
+  ZH = 'zh',
 }
 
 export enum AppNotifications {
   ON = 'on',
   OFF = 'off',
-}
-
-export enum AppTheme {
-  LIGHT = 'light',
-  DARK = 'dark',
 }
 
 export type UserSettings = {

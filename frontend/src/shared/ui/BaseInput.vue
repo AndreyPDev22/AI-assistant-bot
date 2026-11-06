@@ -68,7 +68,19 @@ const descriptionId = computed(() => `${id}-description`);
 </script>
 
 <style lang="scss" scoped>
+:root[data-theme='dark'] {
+  .base-input {
+    --error-input-border-color: #d64c59;
+    --error-message-color: #d64c59;
+    --error-message-background: black;
+  }
+}
+
 .base-input {
+  --error-input-border-color: #c21122;
+  --error-message-color: #a51a27;
+  --error-message-background: white;
+
   position: relative;
 
   &__label {
@@ -103,7 +115,7 @@ const descriptionId = computed(() => `${id}-description`);
     }
 
     &--error {
-      border-color: #c21122;
+      border-color: var(--error-input-border-color);
     }
   }
 
@@ -131,10 +143,10 @@ const descriptionId = computed(() => `${id}-description`);
     padding-block: 7px;
 
     text-align: center;
-    color: #a51a27;
+    color: var(--error-message-color);
 
-    border: 1px solid #a51a27;
-    background-color: white;
+    border: 1px solid var(--error-message-color);
+    background-color: var(--error-message-background);
 
     z-index: 100;
   }

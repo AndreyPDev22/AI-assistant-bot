@@ -1,13 +1,20 @@
 import { z } from 'zod';
 
+import { i18n } from '@/shared/i18n';
+
 const GROUP_PATTERN = /^(\d{3}|\d{2}[АA])-\d{3,4}$/;
-const MIN_PASSWORD_LENGTH = 8;
 
 export const registerSchema = z.object({
-  lastName: z.string().trim().min(1, 'Укажите фамилию'),
-  firstName: z.string().trim().min(1, 'Укажите имя'),
+  lastName: z.string().trim().min(1, i18n.global.t('auth.registrationForm.fields.lastName.error')),
+  firstName: z
+    .string()
+    .trim()
+    .min(1, i18n.global.t('auth.registrationForm.fields.firstName.error')),
   middleName: z.string().trim(),
-  group: z.string().trim().regex(GROUP_PATTERN, 'Номер группы в неверном формате'),
-  email: z.string().trim().email('Некорректный адрес почты'),
-  password: z.string().min(MIN_PASSWORD_LENGTH, `Не короче ${MIN_PASSWORD_LENGTH} символов`),
+  group: z
+    .string()
+    .trim()
+    .regex(GROUP_PATTERN, i18n.global.t('auth.registrationForm.fields.group.error')),
+  email: z.string().trim().email(i18n.global.t('auth.registrationForm.fields.email.error')),
+  password: z.string().min(8, i18n.global.t('auth.registrationForm.fields.password.error')),
 });

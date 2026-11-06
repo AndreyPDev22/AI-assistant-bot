@@ -40,6 +40,7 @@ import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 
 import { MessageInput, SenderRole, type Message, type MessagePayload } from '@/modules/message';
+import { AppNotifications, useUserStore } from '@/modules/user';
 
 import { getErrorMessage } from '@/shared/api/client';
 
@@ -47,12 +48,21 @@ import { useChatStore } from '../model/store';
 import { RouteNames } from '../routes';
 import ChatMessages from './ChatMessages.vue';
 
+const POLLING_INTERVAL_MS = 1000;
+const POLLING_TIMEOUT_MS = 15_000;
+
+let pollingTimerId = 0;
+let pollingDeadline = 0;
+let pollingChatId: string | null = null;
+
 const { chatId = undefined } = defineProps<{
   chatId?: string;
 }>();
 
 const router = useRouter();
+
 const chatStore = useChatStore();
+const { user } = useUserStore();
 
 const messageInput = useTemplateRef('messageInput');
 
@@ -64,12 +74,18 @@ const isEmptyMessagesList = computed(() => {
   return !chatId || (isMessagesLoaded.value && !chatStore.messages.length);
 });
 
-const POLLING_INTERVAL_MS = 1000;
-const POLLING_TIMEOUT_MS = 15_000;
+watch(
+  () => chatId,
+  (newChatId) => {
+    if (pollingChatId && pollingChatId !== newChatId) {
+      stopPolling();
+    }
+  },
+);
 
-let pollingTimerId = 0;
-let pollingDeadline = 0;
-let pollingChatId: string | null = null;
+onBeforeUnmount(() => {
+  stopPolling();
+});
 
 function stopPolling() {
   if (pollingTimerId) {
@@ -87,6 +103,15 @@ function startPolling(targetChatId: string, knownAssistantIds: Set<string>) {
   pollingDeadline = Date.now() + POLLING_TIMEOUT_MS;
   isAwaitingAssistant.value = true;
 
+  const _createNotification = (message: string) => {
+    if (user?.settings.notifications === AppNotifications.ON) {
+      new Notification('Ответ готов', {
+        body: message,
+        icon: '/favicon.ico',
+      });
+    }
+  };
+
   const tick = async () => {
     try {
       await chatStore.fetchMessages(targetChatId);
@@ -94,11 +119,28 @@ function startPolling(targetChatId: string, knownAssistantIds: Set<string>) {
       // Не обрабатываем
     }
 
-    const hasNewAssistant = chatStore.messages.some((message) => {
-      return message.senderRole === SenderRole.ASSISTANT && !knownAssistantIds.has(message.id);
-    });
+    const newAssistantMessage = chatStore.messages.find(
+      (message) =>
+        message.senderRole === SenderRole.ASSISTANT && !knownAssistantIds.has(message.id),
+    );
 
-    if (hasNewAssistant || Date.now() >= pollingDeadline) {
+    if (newAssistantMessage) {
+      if (!('Notification' in window)) {
+        toast.error('Этот браузер не поддерживает уведомления.');
+        return;
+      }
+
+      if (Notification.permission !== 'granted') {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          _createNotification(newAssistantMessage.text);
+        }
+      } else {
+        _createNotification(newAssistantMessage.text);
+      }
+    }
+
+    if (newAssistantMessage || Date.now() >= pollingDeadline) {
       stopPolling();
       return;
     }
@@ -141,19 +183,6 @@ async function sendMessage(payload: MessagePayload) {
 
   startPolling(response.chatId, knownAssistantIds);
 }
-
-watch(
-  () => chatId,
-  (newChatId) => {
-    if (pollingChatId && pollingChatId !== newChatId) {
-      stopPolling();
-    }
-  },
-);
-
-onBeforeUnmount(() => {
-  stopPolling();
-});
 </script>
 
 <style lang="scss" scoped>

@@ -63,13 +63,17 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { toast } from 'vue3-toastify';
 import clickOutside from 'click-outside-vue3';
 
 import { RouteNames } from '../../routes';
+
 import type { Chat } from '../../model/chat';
+import { useChatStore } from '../../model/store';
+
 import heartIcon from './assets/heart.svg';
 import trashIcon from './assets/trash.svg';
-import { useChatStore } from '../../model/store';
 
 const { chat } = defineProps<{
   chat: Chat;
@@ -84,21 +88,30 @@ defineEmits<{
 
 const vClickOutside = clickOutside.directive;
 
+const { t } = useI18n();
 const chatStore = useChatStore();
 
 const chatActions = computed(() => [
   {
-    title: chat.isFavorite ? 'Удалить из избранного' : 'Добавить чат в избранное',
+    title: chat.isFavorite ? t('chats.deleteFromFavorite') : t('chats.addToFavorite'),
     icon: heartIcon,
-    action: () => {
-      chatStore.toggleFavorite(chat.id);
+    action: async () => {
+      try {
+        await chatStore.toggleFavorite(chat.id);
+      } catch (err) {
+        toast.error(err);
+      }
     },
   },
   {
-    title: 'Удалить чат',
+    title: t('chats.deleteChat'),
     icon: trashIcon,
-    action: () => {
-      chatStore.deleteChat(chat.id);
+    action: async () => {
+      try {
+        await chatStore.deleteChat(chat.id);
+      } catch (err) {
+        toast.error(err);
+      }
     },
   },
 ]);

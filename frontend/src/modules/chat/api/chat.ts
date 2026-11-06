@@ -1,6 +1,6 @@
 import type { Message, MessagePayload } from '@/modules/message';
 
-import { apiRequest, APIResponseStatus } from '@/shared/api/client';
+import { apiRequest } from '@/shared/api/client';
 
 import type { Chat } from '../model/chat';
 
@@ -32,14 +32,8 @@ export const chatApi = {
   },
 
   deleteChat: async (chatId: string) => {
-    try {
-      await apiRequest(`/api/chats/${chatId}`, {
-        method: 'DELETE',
-      });
-    } catch {
-      return { status: APIResponseStatus.INTERNAL_SERVER_ERROR };
-    }
-
-    return { status: APIResponseStatus.NO_CONTENT };
+    await apiRequest(`/api/chats/${chatId}`, {
+      method: 'DELETE',
+    });
   },
 };
