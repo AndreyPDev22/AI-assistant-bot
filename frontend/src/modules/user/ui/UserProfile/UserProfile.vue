@@ -105,26 +105,26 @@ const LANGUAGE_OPTIONS = computed<SelectOption[]>(() => [
 
 watch(
   () => settings.value.theme,
-  async (newTheme, oldTheme) => {
+  async () => {
     try {
       await updateSettings(settings.value);
     } catch {
       toast.error('Не удалось обновить настройки');
-      return;
-    }
-    if (newTheme !== oldTheme) {
-      i18n.global.locale.value = settings.value.language;
     }
   },
 );
 
 watch(
   () => settings.value.language,
-  async () => {
+  async (newLang, oldLang) => {
     try {
       await updateSettings(settings.value);
     } catch {
       toast.error('Не удалось обновить настройки');
+    }
+
+    if (newLang !== oldLang) {
+      i18n.global.locale.value = settings.value.language;
     }
   },
 );

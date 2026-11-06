@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, useTemplateRef, onBeforeUnmount } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 
@@ -62,7 +63,7 @@ const { chatId = undefined } = defineProps<{
 const router = useRouter();
 
 const chatStore = useChatStore();
-const { user } = useUserStore();
+const { user } = storeToRefs(useUserStore());
 
 const messageInput = useTemplateRef('messageInput');
 
@@ -104,7 +105,7 @@ function startPolling(targetChatId: string, knownAssistantIds: Set<string>) {
   isAwaitingAssistant.value = true;
 
   const _createNotification = (message: string) => {
-    if (user?.settings.notifications === AppNotifications.ON) {
+    if (user.value?.settings.notifications === AppNotifications.ON) {
       new Notification('Ответ готов', {
         body: message,
         icon: '/favicon.ico',
