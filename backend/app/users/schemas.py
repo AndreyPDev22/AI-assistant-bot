@@ -1,11 +1,45 @@
-from typing import Annotated
+from datetime import datetime
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import UploadFile
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    StringConstraints,
+    field_validator,
+    model_validator,
+)
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 Password = Annotated[str, Field(min_length=8, max_length=128)]
+Language = Literal["ru", "zh", "en"]
+Theme = Literal["dark", "light"]
+Notifications = Literal["on", "off"]
+
+
+class UserSettings(BaseModel):
+    language: Language = "ru"
+    theme: Theme = "light"
+    notifications: Notifications = "off"
+
+
+class SettingsUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    language: Language | None = None
+    theme: Theme | None = None
+    notifications: Notifications | None = None
+
+    @model_validator(mode="after")
+    def require_values(self):
+        if not self.model_fields_set or any(
+            getattr(self, field) is None for field in self.model_fields_set
+        ):
+            raise ValueError("Передайте непустые настройки для обновления")
+        return self
 
 
 class RegisterInput(BaseModel):
@@ -33,3 +67,6 @@ class UserResponse(BaseModel):
     group: str
     email: str
     photo_url: str | None
+    settings: UserSettings
+    created_at: datetime
+    updated_at: datetime

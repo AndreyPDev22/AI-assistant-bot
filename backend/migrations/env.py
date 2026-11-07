@@ -3,10 +3,13 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import create_engine, pool
 
-from app.auth.models import AuthSession  # noqa: F401
 from app.core.config import get_settings
 from app.core.database import Base
-from app.users.models import User  # noqa: F401
+
+from app.auth.models import AuthSession as AuthSession
+from app.auth.models import RefreshToken as RefreshToken
+
+from app.users.models import User as User
 
 config = context.config
 if config.config_file_name:

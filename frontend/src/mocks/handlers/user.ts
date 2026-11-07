@@ -28,7 +28,7 @@ const MOCK_ACCOUNTS: MockAccount[] = [
       settings: {
         language: AppLanguage.RU,
         notifications: AppNotifications.OFF,
-        theme: AppTheme.DARK,
+        theme: AppTheme.LIGHT,
       },
     },
     password: 'password123',
@@ -57,6 +57,13 @@ function errorResponse(status: APIResponseStatus, message: string) {
 }
 
 export const userApiHandlers = [
+  http.post('/api/auth/refresh', () => {
+    const account = MOCK_ACCOUNTS.find(({ user }) => user.id === currentUserId);
+    if (!account) {
+      return errorResponse(APIResponseStatus.NOT_AUTHORIZED, 'Необходима авторизация');
+    }
+    return response(account.user);
+  }),
   http.post('/api/users/register', async ({ request }) => {
     await delay(500);
 
@@ -119,7 +126,7 @@ export const userApiHandlers = [
       settings: {
         language: AppLanguage.RU,
         notifications: AppNotifications.OFF,
-        theme: AppTheme.DARK,
+        theme: AppTheme.LIGHT,
       },
     };
 

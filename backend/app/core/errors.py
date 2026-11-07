@@ -4,6 +4,10 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
+from starlette.status import (
+    HTTP_422_UNPROCESSABLE_CONTENT,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +32,13 @@ def register_error_handlers(app: FastAPI) -> None:
             for error in exc.errors()
         ]
         return JSONResponse(
-            status_code=422,
+            status_code=HTTP_422_UNPROCESSABLE_CONTENT,
             content={
                 "data": None,
-                "error": {"code": 422, "message": "Проверьте данные запроса"},
+                "error": {
+                    "code": HTTP_422_UNPROCESSABLE_CONTENT,
+                    "message": "Проверьте данные запроса",
+                },
                 "detail": details,
             },
         )
@@ -39,4 +46,4 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def unexpected_error(request: Request, exc: Exception) -> JSONResponse:
         logger.error("Unhandled %s on %s", type(exc).__name__, request.url.path)
-        return error_response(500, "Внутренняя ошибка сервера")
+        return error_response(HTTP_500_INTERNAL_SERVER_ERROR, "Внутренняя ошибка сервера")

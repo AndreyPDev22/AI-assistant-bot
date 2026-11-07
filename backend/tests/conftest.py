@@ -7,11 +7,13 @@ from alembic import command
 from alembic.config import Config
 from dotenv import dotenv_values
 from fastapi.testclient import TestClient
+from moto import mock_aws
 from sqlalchemy import create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
 
 from app.core.config import BACKEND_DIR, Settings, get_settings
+
 from app.main import create_app
 
 
@@ -32,6 +34,9 @@ def test_settings():
         database_url=test_url,
         jwt_secret_key=secrets.token_hex(32),
         allowed_origins=["http://localhost:5173", "http://testserver"],
+        s3_bucket="ai-assistant-test-photos",
+        s3_access_key_id="testing",
+        s3_secret_access_key="testing",
     )
 
 
@@ -53,7 +58,17 @@ def engine(test_settings):
 
 
 @pytest.fixture
-def app(engine, test_settings):
+def s3(test_settings):
+    from app.core.storage import S3PhotoStorage
+
+    with mock_aws():
+        client = S3PhotoStorage(test_settings).client
+        client.create_bucket(Bucket=test_settings.s3_bucket)
+        yield client
+
+
+@pytest.fixture
+def app(engine, test_settings, s3):
     connection = engine.connect()
     transaction = connection.begin()
     application = create_app(test_settings)

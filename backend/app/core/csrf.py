@@ -1,3 +1,4 @@
+from starlette.status import HTTP_403_FORBIDDEN
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.core.errors import error_response
@@ -19,7 +20,7 @@ class CSRFMiddleware:
             if headers.get(b"x-csrf-protection") != b"1" or (
                 origin is not None and origin.decode("latin-1") not in self.allowed_origins
             ):
-                response = error_response(403, "Запрос не прошёл проверку CSRF")
+                response = error_response(HTTP_403_FORBIDDEN, "Запрос не прошёл проверку CSRF")
                 await response(scope, receive, send)
                 return
         await self.app(scope, receive, send)
