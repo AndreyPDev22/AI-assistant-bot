@@ -4,12 +4,15 @@ from fastapi import Depends, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import APIKeyHeader
 
-from app.auth.router import router as auth_router
 from app.core.config import Settings, get_settings
 from app.core.csrf import CSRFMiddleware
 from app.core.database import create_session_factory
 from app.core.errors import register_error_handlers
 from app.core.schemas import Envelope
+from app.core.storage import S3PhotoStorage
+
+from app.auth.router import router as auth_router
+
 from app.users.router import router as users_router
 
 
@@ -19,8 +22,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        yield
-        session_factory.kw["bind"].dispose()
+        try:
+            yield
+        finally:
+            session_factory.kw["bind"].dispose()
+            app.state.photo_storage.close()
 
     app = FastAPI(
         title="AI Assistant API",
@@ -38,6 +44,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
     app.state.session_factory = session_factory
+    app.state.photo_storage = S3PhotoStorage(settings)
     register_error_handlers(app)
     app.add_middleware(CSRFMiddleware, allowed_origins=settings.allowed_origins)
     app.add_middleware(
