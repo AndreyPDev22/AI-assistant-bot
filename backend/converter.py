@@ -11,7 +11,12 @@ import pptx
 import pandas
 from faster_whisper import WhisperModel
 
-from fastapi import UploadFile, HTTPException, status
+from fastapi import UploadFile, HTTPException
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_413_CONTENT_TOO_LARGE,
+    HTTP_415_UNSUPPORTED_MEDIA_TYPE
+)
 
 ALLOWED_MIMETYPES = {
     "text/plain": "txt",
@@ -51,9 +56,9 @@ def file_to_str(
 ):
     file_type = ALLOWED_MIMETYPES.get(file.content_type)
     if not file_type:
-        raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, "Формат файла не поддерживается!")
+        raise HTTPException(HTTP_415_UNSUPPORTED_MEDIA_TYPE, "Формат файла не поддерживается!")
     if file.size > MAX_FILE_SIZE:
-        raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "Размер файла превышает 10 МБ!")
+        raise HTTPException(HTTP_413_CONTENT_TOO_LARGE, "Размер файла превышает 10 МБ!")
     
     file_group = get_file_group(file_type)
 
@@ -111,7 +116,9 @@ def file_to_str(
         elif file_group == "mp3":
             segments, info = audio_model.transcribe(file_bytes, beam_size=5)
             result = "".join(segment.text for segment in segments).strip()
+
+        file_bytes.close()
     except Exception as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Не удалось прочитать файл! ({e})")
+        raise HTTPException(HTTP_400_BAD_REQUEST, f"Не удалось прочитать файл! ({e})")
 
     return result
